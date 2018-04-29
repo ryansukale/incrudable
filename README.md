@@ -3,34 +3,107 @@ incrudable
 
 Wait for it...
 
-Define a set of resources as follows
+```js
+// If you are using redux-thunk
+import incrudable from 'incrudable/redux-thunk';
+
+// If you are using redux-observable
+// import incrudable from 'incrudable/redux-observable';
+
+// Define the configuration for your resources as follows
 const resources = {
   albums: {
-    basePath: '/data/albums',
-    operations: ['create', 'read', 'update', 'del']
-  },
-  users: {
-    basePath: '/data/users',
-    operations: ['create', 'read']
-  },
+    name: 'albums',
+    singular: 'album',
+    basePath: '/data/albums'
+  }
 };
 
-```js
-import incrudable from 'incrudable/redux-thunk';
-import incrudable from 'incrudable/redux-observable';
-```
+export * from incrudable(resources);
 
-```js
-const {albums, users} = incrudable(resources);
+/** This returns a object with the following properties
+{
+  albums: {
+    actions: {
+      create: {success: f() , error: f(), wait: f()}
+      read: {success: f() , error: f(), wait: f()}
+      update: {success: f() , error: f(), wait: f()}
+      del: {success: f() , error: f(), wait: f()}
+      list: {success: f() , error: f(), wait: f()}
+    }
+    thunks: {
+      create: f(),
+      read: f(),
+      update: f(),
+      del: f(),
+      list: f()
+    }
+  }
+}
+*/
+
+// You can use redux to dispatch
+
+import {albums} from 'modules/resources'
+const {thunks, actions} = albums;
+
+const payloadForCreate = {body: {title: 'Elements of Life', genre: 'trance'}};
+dispatch(
+  thunks.create(payloadForCreate, {actions: actions.create})
+);
+
+const payload = {query: {page: 10}};
+dispatch(
+  thunks.list(payloadForList, {actions: actions.list})
+);
+
+import createActionGroup from 'incrudable/lib/createActionGroup';
+
+// Create and export your application specific action group
+export const filterAlbumActions = createActionGroup('FILTER_BY_GENRE');
+
+// Reuse the list thunk, but dispatch your custom action groups
+const payload = {query: {genre: 'trance'}};
+dispatch(
+  thunks.list(payloadForList, {actions: filterAlbumActions})
+);
+
+In your reducers, you can listen as follows
+// import {albums} from 'modules/albums/resources'
+// import filterAlbumActions from 'modules/albums/filter';
+
+// Plain old swich based reducers
+function albumsReducer(state, {action, payload}) {
+  switch (action) {
+    case albums.actions.create.success:
+      return {latest: payload};
+    case albums.actions.create.error:
+      return {errors: payload};
+    case albums.actions.create.wait:
+      return {isLoading: true};
+
+    // Handle your custom action group
+    case filterActions.success:
+      return {by_genre: payload};
+    case filterActions.error:
+      return {errors: payload};
+    case filterActions.wait:
+      return {isFiltering: true};
+  }
+}
+
+**/
+
 ```
 
 To create tooling for resources individually
+
 ```js
 // With thunks
-const { actions, thunks } = incrudable.fromResource(resources.albums);
+const { actions, thunks } = incrudable.fromResource(albums);
 
 // With epics
-const { actions, epics } = incrudable.fromResource(resources.albums);
+const { actions, epics } = incrudable.fromResource(albums);
 ```
 
 actions
@@ -52,10 +125,11 @@ dispatch(actions.create.fail(payload));
 }
 
 {
-  createAlbums: ...,
-  readAlbums: ...,
-  updateAlbums: ...,
-  delAlbums: ...,
+  createAlbum: f() ...,
+  readAlbum: f() ...,
+  updateAlbum: f() ...,
+  delAlbum: f() ...,
+  listAlbums: f() ...,
 }
 
 -----
@@ -86,13 +160,8 @@ export default createReducer({
 export default createTasks({
   resource: 'albums',
   singular: 'album',
-  routes: {
-    create: '/api/albums',
-    read: '/api/albums/{id}'
-    update: '/api/albums/{id}',
-    del: '/api/albums/{id}',
-    list: '/api/albums'
-  }
+  basePath: '/api/albums',
+  operations: ['create', 'read', 'update', 'del', 'list']
 });
 
 // tasks/initDashboard.js
@@ -108,8 +177,10 @@ dispatch(
 
 dispatch(
   updateAlbum(
-    {data: {title: 'By the rivers of Babylon'}}
-    {params: {id: 10}},
+    {
+      body: {title: 'By the rivers of Babylon'}
+      params: {id: 10}
+    },
     {actions: jobActions.createdByUser}
   )
 );
@@ -117,9 +188,11 @@ dispatch(
 
 ```
 Additional Configuration
-// If your endpoint is not restful, set `restful` as false and your tasks will use POST instead of restful methods
+// If your endpoint is not restful, set `restful` as false and provide a `routes` hash and your tasks will use POST instead of restful methods
 
-const config = {restful: false};
+
+
+
 export default createTasks({
   resource: 'albums',
   singular: 'album',
