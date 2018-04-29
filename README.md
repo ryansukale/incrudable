@@ -61,7 +61,7 @@ dispatch(actions.create.fail(payload));
 -----
 ```js
 // modules/jobs/actions.js
-export const createdByUser = generateActions('JOBS_CREATED_BY_USER');
+export const createdByUser = createActionGroup('JOBS_CREATED_BY_USER');
 
 /**
 This generates an object with three named actions
@@ -77,21 +77,21 @@ createdByUser = {
 import {createdByUser} from '../modules/jobs/actions';
 
 export default createReducer({
-  [createdBy.wait]: () => ({isLoading: true}),
-  [createdBy.success]: (state, payload) => ({...state, ...payload}) ,
-  [createdBy.error]: (state, payload) => ({errors: payload})
+  [createdByUser.wait]: (state, payload) => ({isLoading: true}),
+  [createdByUser.success]: (state, payload) => payload,
+  [createdByUser.error]: (state, payload) => ({errors: payload})
 }, {});
 
 // modules/jobs/tasks/crud.js
-const endpoints = {
-  create: '/api/jobs',
-  read: '/api/jobs/{id}'
-  update: '/api/jobs/{id}',
-  del: '/api/jobs/{id}',
-  list: '/api/jobs'
+const routes = {
+  create: '/api/albums',
+  read: '/api/albums/{id}'
+  update: '/api/albums/{id}',
+  del: '/api/albums/{id}',
+  list: '/api/albums'
 };
 
-export default generateTasks('JOBS', endpoints);
+export default createTasks('ALBUMS', routes, config);
 
 // tasks/initDashboard.js
 import {list as listAlbums} from '../modules/jobs/tasks/crud';
@@ -113,43 +113,17 @@ dispatch(
 );
 ```
 
+```
+Additional Configuration
+// If your endpoint is not restful, set `restful` as false and your tasks will use POST instead of restful methods
 
-----
-
-Alternative - An Rxjs like interface
-
-
-```js
-// modules/jobs/actions.js
-export const createdByUser = generateActions('JOBS_CREATED_BY_USER');
-
-// This will export an object with three functions
-{
-  success: f()...
-  error: f() ...
-  wait: f()...
-}
-
-import {list as listAlbums} from '../modules/jobs/tasks/crud';
-import jobActions from '../modules/jobs/actions';
-
-dispatch(
-  listAlbums(data, jobActions.createdByUser)
-);
-
-
-listAlbums({
-  success: f()
-  error: f()
-  wait: f()
-})
-
-listAlbums(data, successAction);
-listAlbums(successAction, errorAction, waitAction);
-listAlbums({
-  success: successAction,
-  error: errorAction,
-  wait: waitAction
-})
-
+const config = {restful: false};
+const routes = {
+  create: '/api/jobs/create',
+  read: '/api/jobs/read'
+  update: '/api/jobs/update',
+  del: '/api/jobs/del',
+  list: '/api/jobs/list'
+};
+export default createTasks('ALBUMS', routes, config);
 ```
