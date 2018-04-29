@@ -157,6 +157,8 @@ const { actions, thunks } = incrudable.fromResource(albums);
 const { actions, epics } = incrudable.fromResource(albums);
 ```
 
+Available as an individual import as `import fromResource from 'incrudable/lib/fromResource'`;
+
 ---
 
 #### incrudable.createActionGroup
@@ -235,8 +237,7 @@ Available as an individual import as `import createCrudTasks from 'incrudable/li
 
 #### Additional Configuration
 
-
-// If your endpoint is not restful, set `restful` as false and provide a `routes` hash and your tasks will use POST instead of restful methods
+If your endpoint is not restful, set `restful` as false and provide a `routes` hash and your tasks will use POST instead of restful methods
 
 ```js
 export default createCrudTasks({
