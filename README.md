@@ -117,6 +117,34 @@ function albumsReducer(state, {action, payload}) {
 
 ---
 
+#### incrudable
+
+Acceps a hash of resource configurations and generates corresponding thunks and actions
+
+```js
+import incrudable from 'incrudable/redux-thunk';
+
+// Define the configuration for your resources as follows
+const resources = {
+  albums: {
+    name: 'albums',
+    singular: 'album',
+    basePath: '/data/albums'
+  },
+  songs: {
+    name: 'songs',
+    singular: 'song',
+    basePath: '/data/songs',
+    operations: ['create', 'read']
+  }
+};
+
+export default incrudable(resources);
+
+```
+
+---
+
 #### incrudable.fromResource
 
 To create tooling for resources individually
