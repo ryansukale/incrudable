@@ -4,6 +4,7 @@ incrudable
 Wait for it...
 
 ```js
+// modules/albums/resources.js
 // If you are using redux-thunk
 import incrudable from 'incrudable/redux-thunk';
 
@@ -21,7 +22,7 @@ const resources = {
 
 export * from incrudable(resources);
 
-/** This returns a object with the following properties
+/** This returns an object with the following properties
 {
   albums: {
     actions: {
@@ -32,11 +33,11 @@ export * from incrudable(resources);
       list: {success: f() , error: f(), wait: f()}
     }
     thunks: {
-      create: f(),
-      read: f(),
-      update: f(),
-      del: f(),
-      list: f()
+      createAlbum: f(),
+      readAlbum: f(),
+      updateAlbum: f(),
+      delAlbum: f(),
+      listAlbums: f()
     }
   }
 }
@@ -45,19 +46,37 @@ export * from incrudable(resources);
 // You can use redux to dispatch
 
 import {albums} from 'modules/resources'
-const {thunks, actions} = albums;
+const {
+  thunks: {createAlbum, listAlbums},
+  actions
+} = albums;
 
-const payloadForCreate = {body: {title: 'Elements of Life', genre: 'trance'}};
+// ---------
+
+const payload = {body: {title: 'Elements of Life', genre: 'trance'}};
 dispatch(
-  thunks.create(payloadForCreate, {actions: actions.create})
+  createAlbum(payload, {actions: actions.create})
 );
+
+// ---------
 
 const payload = {query: {page: 10}};
 dispatch(
-  thunks.list(payloadForList, {actions: actions.list})
+  listAlbums(payload, {actions: actions.list})
 );
 
+```
+
+---
+
+You can reuse thunks and export custom actions. This comes in handy when you want to use filters, sorting, etc but want to dispatch custom actions based on business logic.
+
+```js
+// modules/albums/filter.js
 import createActionGroup from 'incrudable/lib/createActionGroup';
+
+import {albums} from 'modules/albums/resources';
+const {thunks: {listAlbums}} = albums;
 
 // Create and export your application specific action group
 export const filterAlbumActions = createActionGroup('FILTER_BY_GENRE');
@@ -65,21 +84,23 @@ export const filterAlbumActions = createActionGroup('FILTER_BY_GENRE');
 // Reuse the list thunk, but dispatch your custom action groups
 const payload = {query: {genre: 'trance'}};
 dispatch(
-  thunks.list(payloadForList, {actions: filterAlbumActions})
+  listAlbums(payload, {actions: filterAlbumActions})
 );
 
-In your reducers, you can listen as follows
-// import {albums} from 'modules/albums/resources'
-// import filterAlbumActions from 'modules/albums/filter';
+// In your reducers, you can listen as follows
+import {albums} from 'modules/albums/resources';
+import filterAlbumActions from 'modules/albums/filter';
 
-// Plain old swich based reducers
+const {actions: {create}} = album;
+
+// Plain old switch based reducers
 function albumsReducer(state, {action, payload}) {
   switch (action) {
-    case albums.actions.create.success:
+    case create.success:
       return {latest: payload};
-    case albums.actions.create.error:
+    case create.error:
       return {errors: payload};
-    case albums.actions.create.wait:
+    case create.wait:
       return {isLoading: true};
 
     // Handle your custom action group
@@ -92,8 +113,6 @@ function albumsReducer(state, {action, payload}) {
   }
 }
 
-**/
-
 ```
 
 To create tooling for resources individually
@@ -105,18 +124,6 @@ const { actions, thunks } = incrudable.fromResource(albums);
 // With epics
 const { actions, epics } = incrudable.fromResource(albums);
 ```
-
-actions
-A hash of the actions based on the list of allowed operations.
-{
-  create: {
-    wait: ... , success: ... , fail: ...
-  }
-}
-
-dispatch(actions.create.wait());
-dispatch(actions.create.success(payload));
-dispatch(actions.create.fail(payload));
 
 {
   [actions.create.wait]: waitHandler,
