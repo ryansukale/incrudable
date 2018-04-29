@@ -135,7 +135,7 @@ const { actions, epics } = incrudable.fromResource(albums);
 
 ```js
 // modules/jobs/actions.js
-export const createdByUser = incrudable.createActionGroup('JOBS_CREATED_BY_USER');
+export const createdByUser = incrudable.createActionGroup('ALBUMS_CREATED_BY_USER');
 
 /**
 This generates an object with three named actions
@@ -150,11 +150,16 @@ createdByUser = {
 // modules/jobs/reducer.js
 import {createdByUser} from '../modules/jobs/actions';
 
-export default createReducer({
-  [createdByUser.wait]: (state, payload) => ({isLoading: true}),
-  [createdByUser.success]: (state, payload) => payload,
-  [createdByUser.error]: (state, payload) => ({errors: payload})
-}, {});
+function albumsReducer(state, {action, payload}) {
+  switch (action) {
+    case createdByUser.success:
+      return {latest: payload};
+    case createdByUser.error:
+      return {errors: payload};
+    case createdByUser.wait:
+      return {isLoading: true};
+  }
+}
 
 ```
 
@@ -202,9 +207,10 @@ Available as an individual import as `import createCrudTasks from 'incrudable/li
 
 #### Additional Configuration
 
-```
+
 // If your endpoint is not restful, set `restful` as false and provide a `routes` hash and your tasks will use POST instead of restful methods
 
+```js
 export default createCrudTasks({
   resource: 'albums',
   singular: 'album',
