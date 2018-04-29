@@ -5,8 +5,8 @@ Wait for it...
 
 Define a set of resources as follows
 const resources = {
-  jobs: {
-    basePath: '/data/jobs',
+  albums: {
+    basePath: '/data/albums',
     operations: ['create', 'read', 'update', 'del']
   },
   users: {
@@ -21,16 +21,16 @@ import incrudable from 'incrudable/redux-observable';
 ```
 
 ```js
-const {jobs, users} = incrudable(resources);
+const {albums, users} = incrudable(resources);
 ```
 
 To create tooling for resources individually
 ```js
 // With thunks
-const { actions, thunks } = incrudable.fromResource(resources.jobs);
+const { actions, thunks } = incrudable.fromResource(resources.albums);
 
 // With epics
-const { actions, epics } = incrudable.fromResource(resources.jobs);
+const { actions, epics } = incrudable.fromResource(resources.albums);
 ```
 
 actions
@@ -52,10 +52,10 @@ dispatch(actions.create.fail(payload));
 }
 
 {
-  createJobs: ...,
-  readJobs: ...,
-  updateJobs: ...,
-  delJobs: ...,
+  createAlbums: ...,
+  readAlbums: ...,
+  updateAlbums: ...,
+  delAlbums: ...,
 }
 
 -----
@@ -83,15 +83,17 @@ export default createReducer({
 }, {});
 
 // modules/jobs/tasks/crud.js
-const routes = {
-  create: '/api/albums',
-  read: '/api/albums/{id}'
-  update: '/api/albums/{id}',
-  del: '/api/albums/{id}',
-  list: '/api/albums'
-};
-
-export default createTasks('ALBUMS', routes, config);
+export default createTasks({
+  resource: 'albums',
+  singular: 'album',
+  routes: {
+    create: '/api/albums',
+    read: '/api/albums/{id}'
+    update: '/api/albums/{id}',
+    del: '/api/albums/{id}',
+    list: '/api/albums'
+  }
+});
 
 // tasks/initDashboard.js
 import {list as listAlbums} from '../modules/jobs/tasks/crud';
@@ -118,12 +120,16 @@ Additional Configuration
 // If your endpoint is not restful, set `restful` as false and your tasks will use POST instead of restful methods
 
 const config = {restful: false};
-const routes = {
-  create: '/api/jobs/create',
-  read: '/api/jobs/read'
-  update: '/api/jobs/update',
-  del: '/api/jobs/del',
-  list: '/api/jobs/list'
-};
-export default createTasks('ALBUMS', routes, config);
+export default createTasks({
+  resource: 'albums',
+  singular: 'album',
+  restful: false
+  routes: {
+    create: '/api/jobs/create',
+    read: '/api/jobs/read'
+    update: '/api/jobs/update',
+    del: '/api/jobs/del',
+    list: '/api/jobs/list'
+  }
+});
 ```
