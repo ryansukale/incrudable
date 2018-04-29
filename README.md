@@ -69,7 +69,7 @@ dispatch(
 
 ---
 
-You can reuse thunks and export custom actions. This comes in handy when you want to use filters, sorting, etc but want to dispatch custom actions based on business logic.
+You can reuse thunks and export custom actions. This comes in handy when you want to use perform the operation of a thunk like fetching a list of things when filtering, sorting, etc but want to dispatch custom actions based on business your business logic / query criteria.
 
 ```js
 // modules/albums/filter.js
@@ -115,6 +115,10 @@ function albumsReducer(state, {action, payload}) {
 
 ```
 
+---
+
+#### incrudable.fromResource
+
 To create tooling for resources individually
 
 ```js
@@ -125,24 +129,13 @@ const { actions, thunks } = incrudable.fromResource(albums);
 const { actions, epics } = incrudable.fromResource(albums);
 ```
 
-{
-  [actions.create.wait]: waitHandler,
-  [actions.create.success]: successHandler,
-  [actions.create.fail]: failHandler
-}
+---
 
-{
-  createAlbum: f() ...,
-  readAlbum: f() ...,
-  updateAlbum: f() ...,
-  delAlbum: f() ...,
-  listAlbums: f() ...,
-}
+#### incrudable.createActionGroup
 
------
 ```js
 // modules/jobs/actions.js
-export const createdByUser = createActionGroup('JOBS_CREATED_BY_USER');
+export const createdByUser = incrudable.createActionGroup('JOBS_CREATED_BY_USER');
 
 /**
 This generates an object with three named actions
@@ -163,8 +156,18 @@ export default createReducer({
   [createdByUser.error]: (state, payload) => ({errors: payload})
 }, {});
 
+```
+
+Available as an individual import as `import createActionGroup from 'incrudable/lib/createActionGroup';`
+
+---
+
+#### incrudable.createCrudTasks
+
+```js
 // modules/jobs/tasks/crud.js
-export default createTasks({
+
+export default incrudable.createCrudTasks({
   resource: 'albums',
   singular: 'album',
   basePath: '/api/albums',
@@ -193,14 +196,16 @@ dispatch(
 );
 ```
 
+Available as an individual import as `import createCrudTasks from 'incrudable/lib/createCrudTasks';`
+
+---
+
+#### Additional Configuration
+
 ```
-Additional Configuration
 // If your endpoint is not restful, set `restful` as false and provide a `routes` hash and your tasks will use POST instead of restful methods
 
-
-
-
-export default createTasks({
+export default createCrudTasks({
   resource: 'albums',
   singular: 'album',
   restful: false
