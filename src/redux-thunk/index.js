@@ -1,7 +1,5 @@
-import processResources from '../lib/processResources';
-import fromResource from './lib/fromResource';
-
-export fromResource;
+import processResources from '../processResources';
+import fromResource from '../fromResource';
 
 export default function incrudable(resources) {
   return processResources(resources, fromResource);

@@ -4,7 +4,12 @@
   "description": "Crud helpers for rxjs and redux based applications",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/*.test.js"
+    "clean": "rimraf lib",
+    "build:commonjs": "babel src --out-dir lib",
+    "build": "npm run clean && npm run build:commonjs",
+    "prepublishOnly": "npm run lint && npm run test && npm run build",
+    "lint": "xo",
+    "test": "&& mocha tests/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +23,10 @@
   "homepage": "https://github.com/ryansukale/incrudable#readme",
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^5.1.1"
+    "mocha": "^5.1.1",
+    "rimraf": "^2.6.2",
+    "webpack-cli": "^2.0.15",
+    "xo": "^0.20.3"
   },
   "dependencies": {
     "babel-core": "^6.26.3",
@@ -26,5 +34,30 @@
     "babel-preset-env": "^1.6.1",
     "redux-actions": "^2.3.0",
     "webpack": "^4.6.0"
+  },
+  "xo": {
+    "prettier": true,
+    "space": true,
+    "rules": {
+      "unicorn/filename-case": [
+        "error",
+        {
+          "case": "camelCase"
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "files": "test/**/*.js",
+        "env": [
+          "jest"
+        ]
+      }
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "trailingComma": "none"
   }
 }

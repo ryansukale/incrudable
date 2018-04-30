@@ -29,3 +29,6 @@ public/assets
 .DS_Store
 
 ignore
+es
+lib
+dist

@@ -1,9 +1,30 @@
 const path = require('path');
+const webpack = require('webpack');
+
+const { NODE_ENV } = process.env;
+const production = NODE_ENV === 'production';
 
 module.exports = {
-  entry: './src/index.js',
+  entry: path.join(__dirname, 'src/index.js'),
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
-  }
+    path: path.join(__dirname, 'dist'),
+    filename: `incrudable${production ? '.min' : ''}.js`,
+    library: 'incrudable',
+    libraryTarget: 'umd'
+  },
+  mode: production ? 'production' : 'development',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loaders: ['babel-loader'],
+        exclude: /node_modules/
+      }
+    ]
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
+    })
+  ]
 };
