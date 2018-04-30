@@ -1,12 +1,4 @@
-import createActionGroup from './createActionGroup';
 const DEFAULT_OPERATIONS = ['create', 'read', 'update', 'del', 'list'];
-
-export function getActions(eventBase, operations) {
-  return operations.reduce((acc, operation) => {
-    acc[operation] = createActionGroup(eventBase, undefined, operation);
-    return acc;
-  }, {});
-}
 
 /**
  * @param  {hash} resource 
