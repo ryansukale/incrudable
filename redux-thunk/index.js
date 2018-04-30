@@ -1,5 +1,5 @@
 import processResources from '../lib/processResources';
-import fromResource from './fromResource';
+import fromResource from './lib/fromResource';
 
 export fromResource;
 
