@@ -28,4 +28,14 @@ describe('createActionGroup', function () {
       expect(actionGroup[type]).to.be.a('function');
     });
   });
+
+  it('creates a default group of actions when the parameter is a string', function () {
+    const statusTypes = ['success', 'fail', 'wait'];
+    const actionGroup = createActionGroup('ALBUMS_CREATED_BY_USER');
+
+    expect(Object.keys(actionGroup)).to.deep.equal(statusTypes);
+    statusTypes.map((type) => {
+      expect(actionGroup[type]).to.be.a('function');
+    });
+  });
 });
