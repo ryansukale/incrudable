@@ -7,10 +7,14 @@ const DEFAULT_STATUS_TYPES = ['success', 'fail', 'wait'];
 /**
  * Creates wait, succcess and fail actions by default
  */
-export default function createActionGroup(eventBase, statusTypes = DEFAULT_STATUS_TYPES, prefix) {
+export default function createActionGroup({
+  base, 
+  prefix,
+  statusTypes = DEFAULT_STATUS_TYPES,
+}) {
   return statusTypes.reduce(function (acc, type) {
     acc[type] = createAction(
-      createActionType(eventBase, {prefix, suffix: type})
+      createActionType(base, {prefix, suffix: type})
     );
     return acc;
   }, {});
