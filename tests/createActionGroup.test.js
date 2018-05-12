@@ -23,7 +23,7 @@ describe('createActionGroup', function () {
     const options = {base: 'albums'};
     const actionGroup = createActionGroup(options);
 
-    expect(Object.keys(actionGroup)).to.deep.equal(statusTypes);
+    expect(Object.keys(actionGroup)).to.have.members(statusTypes);
     statusTypes.map((type) => {
       expect(actionGroup[type]).to.be.a('function');
     });
@@ -33,7 +33,7 @@ describe('createActionGroup', function () {
     const statusTypes = ['success', 'fail', 'wait'];
     const actionGroup = createActionGroup('ALBUMS_CREATED_BY_USER');
 
-    expect(Object.keys(actionGroup)).to.deep.equal(statusTypes);
+    expect(Object.keys(actionGroup)).to.have.members(statusTypes);
     statusTypes.map((type) => {
       expect(actionGroup[type]).to.be.a('function');
     });

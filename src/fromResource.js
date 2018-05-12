@@ -10,7 +10,7 @@ const DEFAULT_OPERATIONS = ['create', 'read', 'update', 'del', 'list'];
  *  }
  * @return {hash} {actions, thunks}
  */
-export default function fromResource(resource) {
+export default function fromResource(crudGenerator, resource) {
   const {name, singular, basePath, operations = DEFAULT_OPERATIONS} = resource;
   const actions = getActions(name, operations);
   return {actions};
