@@ -9,7 +9,7 @@
     "build": "npm run clean && npm run build:commonjs",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "lint": "xo",
-    "test": "mocha --compilers js:babel-core/register tests/*.test.js"
+    "test": "mocha --recursive --compilers js:babel-core/register tests/"
   },
   "repository": {
     "type": "git",

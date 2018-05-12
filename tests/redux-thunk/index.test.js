@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 
-import incrudable from '../src';
+import incrudable from '../../src/redux-thunk';
 
 const resources = {
   albums: {

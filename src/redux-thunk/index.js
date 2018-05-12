@@ -1,5 +1,6 @@
 // // import processResources from '../processResources';
-// import fromResource from '../fromResource';
+import fromResource from './fromResource';
+import processResources from '../processResources';
 
 // function crudGenerator(resource) {
 //   return resource;
@@ -13,3 +14,7 @@
 //   }, {});
 //   // return processResources(resources, fromResource);
 // }
+
+export default function incrudable(resources) {
+  return processResources(resources, fromResource);
+}
