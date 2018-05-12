@@ -20,10 +20,9 @@ describe('createActionType', function () {
 
   it('returns a string if prefix isint passed', function () {
     const options = {
-      prefix: 'create',
       suffix: 'success'
     };
-    expect(createActionType('albums', options)).to.equal('CREATE_ALBUMS_SUCCESS');
+    expect(createActionType('albums', options)).to.equal('ALBUMS_SUCCESS');
   });
 
   it('returns a string when options are not prvided', function () {
