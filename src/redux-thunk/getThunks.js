@@ -1,4 +1,4 @@
-// import createActionGroup from './createActionGroup';
+import generateThunk from './generateThunk';
 
 function getTaskName(resource, operation) {
   // TODO transform to camel case names like 
@@ -6,10 +6,15 @@ function getTaskName(resource, operation) {
   return operation;
 }
 
-export default function getThunks(resource, actions) {
+export default function getThunks(resource, actions, config) {
   return Object.keys(actions).reduce((acc, operation) => {
     const taskName = getTaskName(resource, operation);
-    acc[taskName] = 'TODO';
+    acc[taskName] = generateThunk({
+      operation,
+      actions: actions[operation],
+      url: resource.basePath
+    }, config);
+
     return acc;
   }, {});
   // return operations.reduce((acc, operation) => {

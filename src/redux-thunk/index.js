@@ -15,6 +15,6 @@ import processResources from '../processResources';
 //   // return processResources(resources, fromResource);
 // }
 
-export default function incrudable(resources) {
-  return processResources(resources, fromResource);
+export default function incrudable(resources, config) {
+  return processResources(resources, fromResource, config);
 }
