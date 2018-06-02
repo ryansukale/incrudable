@@ -32,6 +32,7 @@
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
+    "batarang": "^2.0.12",
     "redux-actions": "^2.3.0",
     "webpack": "^4.6.0"
   },

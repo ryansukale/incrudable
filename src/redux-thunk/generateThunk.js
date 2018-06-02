@@ -1,21 +1,34 @@
+import createUrl from 'batarang/createUrl';
+
+import {onJsonApiResponse, onJsonApiError} from './handlers';
+
 const defaultAjax = {
-  postJSON() {
+  post(url, ) {
     // TODO based on fetch
   }
 }
 
-function create({url, actions}, {ajax}) {
-  return function createThunk(params, done) {
+function create({
+  url,
+  actions,
+  onResponse = onJsonApiResponse,
+  onError = onJsonApiError
+}, {ajax}) {
+  return function createThunk({params, query, body}, done) {
     return (dispatch) => {
       actions.wait && dispatch(actions.wait());
 
+      const request = {params, query, body};
+      const config = {actions, dispatch, onError, done};
+      const fullUrl = createUrl(url, {params, query});
+
       return ajax
-        .postJSON(url, params)
-        .then((data) => {
-          actions.success && dispatch(actions.success(data));
+        .post(fullUrl, request)
+        .then((response) => {
+          return onSuccess(config, request, response)
         })
         .catch((errors) => {
-          actions.fail && dispatch(actions.fail(data));
+          return onError(config, request, response);
         });
     }
   }
