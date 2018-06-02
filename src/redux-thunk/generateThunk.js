@@ -1,12 +1,7 @@
 import createUrl from 'batarang/createUrl';
 
 import {onJsonApiResponse, onJsonApiError} from './handlers';
-
-const defaultAjax = {
-  post(url, ) {
-    // TODO based on fetch
-  }
-}
+import defaultAjax from './ajax';
 
 function create({
   url,
@@ -23,7 +18,7 @@ function create({
       const fullUrl = createUrl(url, {params, query});
 
       return ajax
-        .post(fullUrl, request)
+        .postJSON(fullUrl, request)
         .then((response) => {
           return onSuccess(config, request, response)
         })

@@ -1,4 +1,4 @@
-export default function onJsonApiResponse({actions, dispatch, onError, done}, request, response) {
+export function onJsonApiResponse({actions, dispatch, onError, done}, request, response) {
   const {errors, data} = response;
   if (errors) {
     onError({actions, dispatch, done}, request, errors);
@@ -10,7 +10,7 @@ export default function onJsonApiResponse({actions, dispatch, onError, done}, re
   done && done(null, payload);
 }
 
-export default function onJsonApiError({actions, dispatch, done}, request, response) {
+export function onJsonApiError({actions, dispatch, done}, request, response) {
   const payload = {request, errors};
   actions.fail && dispatch(actions.fail(payload));
   done && done(payload);
