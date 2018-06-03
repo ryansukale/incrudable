@@ -31,7 +31,7 @@ function createMockAjax() {
 }
 
 describe('generateThunk', function () {
-  it('actions and thunks for resources', function (done) {
+  it('generates thunk for `create` operation that dispatches all the actions', function () {
     const options = {
       operation: 'create',
       actions: createMockActions(),
@@ -39,16 +39,13 @@ describe('generateThunk', function () {
     };
     const config = {ajax: createMockAjax()};
     const dispatch = sinon.spy();
-
     const thunk = generateThunk(options, config)({body: 'hello'});
 
-    thunk(dispatch)
+    return thunk(dispatch)
       .then(() => {
         expect(options.actions.wait.calledOnce).to.equal(true);
         expect(options.actions.success.calledOnce).to.equal(true);
         expect(dispatch.calledTwice).to.equal(true);
-
-        done();
-      }).catch(done);
+      })
   });
 });
