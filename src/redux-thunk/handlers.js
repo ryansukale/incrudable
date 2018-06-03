@@ -2,12 +2,13 @@ export function onJsonApiResponse({actions, dispatch, onError, done}, request, r
   const {errors, data} = response;
   if (errors) {
     onError({actions, dispatch, done}, request, errors);
-    return;
+    return undefined;
   }
 
   const payload = {request, response};
   dispatch(actions.success(payload));
   done && done(null, payload);
+  return undefined;
 }
 
 export function onJsonApiError({actions, dispatch, done}, request, response) {

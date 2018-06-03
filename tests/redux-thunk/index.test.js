@@ -19,8 +19,8 @@ describe('incrudable', function () {
   it('actions and thunks for resources', function () {
     // const operations = ['create', 'read'];
     const {albums, songs} = incrudable(resources);
-    console.log('albums', albums);
-    console.log('songs', songs);
+    // console.log('albums', albums);
+    // console.log('songs', songs);
     // const subgroups = ['fail', 'success', 'wait'];
 
     // expect(Object.keys(actions)).to.have.members(operations);

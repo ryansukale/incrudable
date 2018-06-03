@@ -6,16 +6,18 @@ import defaultAjax from './ajax';
 function create({
   url,
   actions,
-  onResponse = onJsonApiResponse,
+  onSuccess = onJsonApiResponse,
   onError = onJsonApiError
 }, {ajax}) {
   return function createThunk({params, query, body}, done) {
     return (dispatch) => {
       actions.wait && dispatch(actions.wait());
+      // dispatch(actions.success());
 
       const request = {params, query, body};
       const config = {actions, dispatch, onError, done};
       const fullUrl = createUrl(url, {params, query});
+
 
       return ajax
         .postJSON(fullUrl, request)
@@ -56,6 +58,8 @@ export const thunkGenerators = {
 export default function generateThunk({
   operation,
   actions,
+  onSuccess,
+  onError,
   url
 }, config = {}) {
   const operationName = operation.toLowerCase();
@@ -66,5 +70,5 @@ export default function generateThunk({
 
   config.ajax = config.ajax || defaultAjax;
 
-  return generator({url, actions}, config);
+  return generator({url, actions, onSuccess, onError}, config);
 }

@@ -9,7 +9,7 @@
     "build": "npm run clean && npm run build:commonjs",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "lint": "xo",
-    "test": "mocha --recursive --compilers js:babel-core/register tests/"
+    "test": "mocha --recursive --require babel-core/register tests/"
   },
   "repository": {
     "type": "git",
@@ -23,8 +23,10 @@
   "homepage": "https://github.com/ryansukale/incrudable#readme",
   "devDependencies": {
     "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "mocha": "^5.1.1",
     "rimraf": "^2.6.2",
+    "sinon": "^5.0.10",
     "webpack-cli": "^2.0.15",
     "xo": "^0.20.3"
   },
