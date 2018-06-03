@@ -1,4 +1,8 @@
 import {expect} from 'chai';
+// TODO
+// import chaiJsonSchema from 'chai-json-schema';
+// chai.use(chaiJsonSchema);
+// http://www.chaijs.com/plugins/chai-json-schema/
 
 import incrudable from '../../src/redux-thunk';
 

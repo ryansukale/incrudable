@@ -3,17 +3,6 @@ import createUrl from 'batarang/createUrl';
 import {onJsonApiResponse, onJsonApiError} from './handlers';
 import defaultAjax from './ajax';
 
-// function performRequest(method) {
-//   return ajax[method](fullUrl, request)
-//     .then((response) => {
-//       return onSuccess(config, request, response)
-//     })
-//     .catch((errors) => {
-//       return onError(config, request, response);
-//     });
-// }
-
-
 function getThunkCreator(ajaxMethodName, config, {ajax}) {
   return function createThunk(request, done) {
     return (dispatch) => {
@@ -42,61 +31,6 @@ function getThunkCreator(ajaxMethodName, config, {ajax}) {
     }
   }
 }
-
-// function create({
-//   url,
-//   actions,
-//   onSuccess = onJsonApiResponse,
-//   onError = onJsonApiError
-// }, {ajax}) {
-//   return function createThunk({params, query, body}, done) {
-//     return (dispatch) => {
-//       actions.wait && dispatch(actions.wait());
-      
-//       const request = {params, query, body};
-//       const config = {actions, dispatch, onError, done};
-//       const fullUrl = createUrl(url, {params, query});
-
-//       return ajax
-//         .postJSON(fullUrl, request)
-//         .then((response) => {
-//           return onSuccess(config, request, response)
-//         })
-//         .catch((errors) => {
-//           return onError(config, request, response);
-//         });
-//     }
-//   }
-// }
-
-// function read({
-//   url,
-//   actions,
-//   onSuccess = onJsonApiResponse,
-//   onError = onJsonApiError
-// }, {ajax}) {
-//   return function readThunk({params, query}, done) {
-//     return (dispatch) => {
-//       actions.wait && dispatch(actions.wait());
-      
-//       const request = {params, query};
-//       const config = {actions, dispatch, onError, done};
-//       const fullUrl = createUrl(url, {params, query});
-
-//       return ajax
-//         .getJSON(fullUrl, request)
-//         .then((response) => {
-//           return onSuccess(config, request, response)
-//         })
-//         .catch((errors) => {
-//           return onError(config, request, response);
-//         });
-//     }
-//   }
-// }
-
-// function read() {}
-
 
 const create = getThunkCreator.bind(null, 'postJSON');
 const read = getThunkCreator.bind(null, 'getJSON');
