@@ -46,6 +46,30 @@ describe('generateThunk', function () {
         expect(options.actions.wait.calledOnce).to.equal(true);
         expect(options.actions.success.calledOnce).to.equal(true);
         expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.postJSON.calledOnce);
+        expect(config.ajax.postJSON.firstCall.args[0]).to.equal('/users');
+      })
+  });
+
+  it('generates thunk for `read` operation that dispatches all the actions', function () {
+    const options = {
+      operation: 'read',
+      actions: createMockActions(),
+      url: '/users/:id'
+    };
+    const config = {ajax: createMockAjax()};
+    const dispatch = sinon.spy();
+    const thunk = generateThunk(options, config)({params: {id: '10'}});
+
+    return thunk(dispatch)
+      .then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.getJSON.calledOnce);
+        expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users/10');
       })
   });
 });
