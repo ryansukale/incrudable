@@ -10,12 +10,26 @@ const resources = {
   albums: {
     name: 'albums',
     singular: 'album',
-    basePath: '/data/albums'
+    basePath: '/data/albums',
+    operations: {
+      create: '/albums',
+      read: '/albums/:id',
+      update: '/albums/:id',
+      del: '/albums/:id',
+      list: '/albums'
+    }
   },
   songs: {
     name: 'songs',
     singular: 'song',
-    basePath: '/data/songs'
+    basePath: '/data/songs',
+    operations: {
+      create: '/albums/:id/songs',
+      read: '/albums/:id/songs/:song_id',
+      update: '/albums/:id/songs/:song_id',
+      del: '/abums/:id/:id/songs/:song_id'
+      list: '/abums/:id/:id/songs'
+    }
   },
 }
 
