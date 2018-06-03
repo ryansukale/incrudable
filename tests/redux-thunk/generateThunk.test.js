@@ -26,7 +26,9 @@ function createMockActions() {
 function createMockAjax() {
   return {
     postJSON: sinon.stub().returns(Promise.resolve('postJSON')),
-    getJSON: sinon.stub().returns(Promise.resolve('getJSON'))
+    getJSON: sinon.stub().returns(Promise.resolve('getJSON')),
+    putJSON: sinon.stub().returns(Promise.resolve('putJSON')),
+    delJSON: sinon.stub().returns(Promise.resolve('delJSON'))
   };
 }
 
@@ -70,6 +72,70 @@ describe('generateThunk', function () {
 
         expect(config.ajax.getJSON.calledOnce);
         expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users/10');
+      })
+  });
+
+
+  it('generates thunk for `update` operation that dispatches all the actions', function () {
+    const options = {
+      operation: 'update',
+      actions: createMockActions(),
+      url: '/users/:id'
+    };
+    const config = {ajax: createMockAjax()};
+    const dispatch = sinon.spy();
+    const thunk = generateThunk(options, config)({params: {id: '10'}});
+
+    return thunk(dispatch)
+      .then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.putJSON.calledOnce);
+        expect(config.ajax.putJSON.firstCall.args[0]).to.equal('/users/10');
+      })
+  });
+
+  it('generates thunk for `delete` operation that dispatches all the actions', function () {
+    const options = {
+      operation: 'del',
+      actions: createMockActions(),
+      url: '/users/:id'
+    };
+    const config = {ajax: createMockAjax()};
+    const dispatch = sinon.spy();
+    const thunk = generateThunk(options, config)({params: {id: '10'}});
+
+    return thunk(dispatch)
+      .then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.delJSON.calledOnce);
+        expect(config.ajax.delJSON.firstCall.args[0]).to.equal('/users/10');
+      })
+  });
+
+  it('generates thunk for `list` operation that dispatches all the actions', function () {
+    const options = {
+      operation: 'list',
+      actions: createMockActions(),
+      url: '/users'
+    };
+    const config = {ajax: createMockAjax()};
+    const dispatch = sinon.spy();
+    const thunk = generateThunk(options, config)({query: {sort_by: 'age'}});
+
+    return thunk(dispatch)
+      .then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.getJSON.calledOnce);
+        expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users?sort_by=age');
       })
   });
 });

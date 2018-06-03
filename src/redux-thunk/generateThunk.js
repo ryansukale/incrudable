@@ -97,21 +97,16 @@ function getThunkCreator(ajaxMethodName, config, {ajax}) {
 
 // function read() {}
 
-function update() {
 
-}
+const create = getThunkCreator.bind(null, 'postJSON');
+const read = getThunkCreator.bind(null, 'getJSON');
+const update = getThunkCreator.bind(null, 'putJSON');
+const del = getThunkCreator.bind(null, 'delJSON');
+const list = read;
 
-function del() {
-
-}
-
-function list() {
-
-}
-
-export const thunkGenerators = {
-  create: getThunkCreator.bind(null, 'postJSON'),
-  read: getThunkCreator.bind(null, 'getJSON'),
+const thunkGenerators = {
+  create,
+  read,
   update,
   del,
   list
