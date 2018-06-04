@@ -6,14 +6,22 @@ import generateThunk from './generateThunk';
 //   return operation;
 // }
 
-export default function getThunks(resource, actions, config) {
-  return Object.keys(actions).reduce((acc, operation) => {
+export default function getThunks(resource, actionGroups, config) {
+  return Object.keys(actionGroups).reduce((acc, operation) => {
     // const taskName = getTaskName(resource, operation);
-    acc[operation] = generateThunk({
+    const actions = actionGroups[operation];
+    const thunk = generateThunk({
       operation,
-      actions: actions[operation],
-      url: resource.basePath
+      actions,
+      url: 'TODO' // resource.basePath
     }, config);
+
+    Object.keys(actions).reduce((target, actionName) => {
+      target[actionName] = actions[actionName];
+      return target;
+    }, thunk);
+
+    acc[operation] = thunk;
 
     return acc;
   }, {});

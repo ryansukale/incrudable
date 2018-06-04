@@ -4,7 +4,7 @@ import createActionGroup from '../src/createActionGroup';
 
 describe('createActionGroup', function () {
   it('creates a group of actions based on all input parameters', function () {
-    const statusTypes = ['fail', 'success'];
+    const statusTypes = ['failure', 'success'];
     const options = {
       prefix: 'create',
       base: 'albums',
@@ -19,7 +19,7 @@ describe('createActionGroup', function () {
   });
 
   it('creates a default group of actions', function () {
-    const statusTypes = ['success', 'fail', 'wait'];
+    const statusTypes = ['success', 'failure', 'wait'];
     const options = {base: 'albums'};
     const actionGroup = createActionGroup(options);
 
@@ -30,7 +30,7 @@ describe('createActionGroup', function () {
   });
 
   it('creates a default group of actions when the parameter is a string', function () {
-    const statusTypes = ['success', 'fail', 'wait'];
+    const statusTypes = ['success', 'failure', 'wait'];
     const actionGroup = createActionGroup('ALBUMS_CREATED_BY_USER');
 
     expect(Object.keys(actionGroup)).to.have.members(statusTypes);

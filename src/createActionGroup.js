@@ -2,7 +2,7 @@ import createAction from 'redux-actions/lib/createAction';
 
 import createActionType from './createActionType';
 
-const DEFAULT_STATUS_TYPES = ['success', 'fail', 'wait'];
+const DEFAULT_STATUS_TYPES = ['success', 'failure', 'wait'];
 
 /**
  * Creates wait, succcess and fail actions by default
