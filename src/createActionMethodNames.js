@@ -3,7 +3,7 @@ const DEFAULT_OPERATIONS = ['create', 'read', 'update', 'del', 'list'];
 export function getMethodName(base, operation) {
   // TODO: capitalize first char of base
   switch (operation) {
-    case: 'list':
+    case 'list':
       return `read${base}List`;
     default:
       return `${operation}${base}`;
