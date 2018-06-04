@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
 import getActions from '../src/getActions';
 
@@ -7,8 +7,8 @@ const operations = {
   read: '/albums/:id/songs/:song_id'
 };
 
-describe('getActions', function () {
-  it('returns action groups for the given operations', function () {
+describe('getActions', () => {
+  it('returns action groups for the given operations', () => {
     const actions = getActions('albums', operations);
     const subgroups = ['failure', 'success', 'wait'];
 
@@ -17,7 +17,7 @@ describe('getActions', function () {
 
     expect(actionGroupNames.length).to.equal(operationNames.length);
     expect(actionGroupNames).to.have.members(operationNames);
-    
+
     expect(Object.keys(actions.create)).to.have.members(subgroups);
     expect(Object.keys(actions.read)).to.have.members(subgroups);
   });

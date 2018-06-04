@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 import getTasks from '../../src/redux-thunk/getTasks';
@@ -14,9 +14,9 @@ const resources = {
   }
 };
 
-describe('getTasks', function () {
-  it('generates tasks for the resources', function () {
-    const {albums} = resources;
+describe('getTasks', () => {
+  it('generates tasks for the resources', () => {
+    const { albums } = resources;
 
     const actionGroups = getActions(albums, albums.operations);
     const tasks = getTasks(albums, actionGroups);
@@ -25,7 +25,7 @@ describe('getTasks', function () {
     expect(tasks.create.success).to.equal(actionGroups.create.success);
     expect(tasks.create.failure).to.equal(actionGroups.create.failure);
     expect(tasks.create.wait).to.equal(actionGroups.create.wait);
-    
+
     expect(tasks.read).to.be.a('function');
     expect(tasks.read.success).to.equal(actionGroups.read.success);
     expect(tasks.read.failure).to.equal(actionGroups.read.failure);

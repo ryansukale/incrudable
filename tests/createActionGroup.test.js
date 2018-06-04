@@ -1,9 +1,9 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
 import createActionGroup from '../src/createActionGroup';
 
-describe('createActionGroup', function () {
-  it('creates a group of actions based on all input parameters', function () {
+describe('createActionGroup', () => {
+  it('creates a group of actions based on all input parameters', () => {
     const statusTypes = ['failure', 'success'];
     const options = {
       prefix: 'create',
@@ -13,28 +13,28 @@ describe('createActionGroup', function () {
     const actionGroup = createActionGroup(options);
 
     expect(Object.keys(actionGroup)).to.deep.equal(statusTypes);
-    statusTypes.map((type) => {
+    statusTypes.map(type => {
       expect(actionGroup[type]).to.be.a('function');
     });
   });
 
-  it('creates a default group of actions', function () {
+  it('creates a default group of actions', () => {
     const statusTypes = ['success', 'failure', 'wait'];
-    const options = {base: 'albums'};
+    const options = { base: 'albums' };
     const actionGroup = createActionGroup(options);
 
     expect(Object.keys(actionGroup)).to.have.members(statusTypes);
-    statusTypes.map((type) => {
+    statusTypes.map(type => {
       expect(actionGroup[type]).to.be.a('function');
     });
   });
 
-  it('creates a default group of actions when the parameter is a string', function () {
+  it('creates a default group of actions when the parameter is a string', () => {
     const statusTypes = ['success', 'failure', 'wait'];
     const actionGroup = createActionGroup('ALBUMS_CREATED_BY_USER');
 
     expect(Object.keys(actionGroup)).to.have.members(statusTypes);
-    statusTypes.map((type) => {
+    statusTypes.map(type => {
       expect(actionGroup[type]).to.be.a('function');
     });
   });

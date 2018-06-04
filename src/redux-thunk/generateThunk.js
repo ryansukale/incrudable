@@ -1,11 +1,11 @@
 import createUrl from 'batarang/createUrl';
 
-import {onJsonApiResponse, onJsonApiError} from './handlers';
+import { onJsonApiResponse, onJsonApiError } from './handlers';
 import defaultAjax from './ajax';
 
-function getThunkCreator(ajaxMethodName, config, {ajax}) {
+function getThunkCreator(ajaxMethodName, config, { ajax }) {
   return function createThunk(request, done) {
-    return (dispatch) => {
+    return dispatch => {
       const {
         url,
         actions,
@@ -14,22 +14,22 @@ function getThunkCreator(ajaxMethodName, config, {ajax}) {
       } = config;
 
       actions.wait && dispatch(actions.wait());
-      
-      const handlerConfig = {actions, dispatch, onFailure, done};
+
+      const handlerConfig = { actions, dispatch, onFailure, done };
       const fullUrl = createUrl(url, {
         params: request.params,
         query: request.query
       });
 
       return ajax[ajaxMethodName](fullUrl, request)
-        .then((response) => {
-          return onSuccess(handlerConfig, request, response)
+        .then(response => {
+          return onSuccess(handlerConfig, request, response);
         })
-        .catch((errors) => {
+        .catch(errors => {
           return onFailure(handlerConfig, request, errors);
         });
-    }
-  }
+    };
+  };
 }
 
 const create = getThunkCreator.bind(null, 'postJSON');
@@ -46,20 +46,21 @@ const thunkGenerators = {
   list
 };
 
-export default function generateThunk({
-  operation,
-  actions,
-  onSuccess,
-  onFailure,
-  url
-}, config = {}) {
+export default function generateThunk(
+  { operation, actions, onSuccess, onFailure, url },
+  config = {}
+) {
   const operationName = operation.toLowerCase();
   const generator = thunkGenerators[operationName];
   if (!generator) {
-    throw new Error(`operation should be one of ${Object.keys(thunkGenerators)}. Received: ${type}`);
+    throw new Error(
+      `operation should be one of ${Object.keys(
+        thunkGenerators
+      )}. Received: ${type}`
+    );
   }
 
   config.ajax = config.ajax || defaultAjax;
 
-  return generator({url, actions, onSuccess, onFailure}, config);
+  return generator({ url, actions, onSuccess, onFailure }, config);
 }

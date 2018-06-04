@@ -5,11 +5,14 @@ export default function getThunks(resource, actionGroups, config) {
     const url = resource.operations[operation];
     const actions = actionGroups[operation];
 
-    const thunk = generateThunk({
-      operation,
-      actions,
-      url
-    }, config);
+    const thunk = generateThunk(
+      {
+        operation,
+        actions,
+        url
+      },
+      config
+    );
 
     Object.keys(actions).reduce((target, actionName) => {
       target[actionName] = actions[actionName];

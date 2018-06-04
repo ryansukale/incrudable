@@ -10,6 +10,9 @@ export function getMethodName(base, operation) {
   }
 }
 
-export default function createActionMethodNames(base, operations = DEFAULT_OPERATIONS) {
+export default function createActionMethodNames(
+  base,
+  operations = DEFAULT_OPERATIONS
+) {
   return operations.map(getMethodName.bind(base));
 }

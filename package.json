@@ -43,6 +43,7 @@
     "prettier": true,
     "space": true,
     "rules": {
+      "bracketSpacing": false,
       "unicorn/filename-case": [
         "error",
         {

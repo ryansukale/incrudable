@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
 import incrudable from '../../src/redux-thunk';
 
@@ -25,12 +25,12 @@ const resources = {
   }
 };
 
-describe('incrudable', function () {
-  it('create the actions and tasks for resources', function () {
+describe('incrudable', () => {
+  it('create the actions and tasks for resources', () => {
     const tasks = incrudable(resources);
 
-    Object.keys(resources).forEach((resource) => {
-      Object.keys(resources[resource].operations).forEach((operation) => {
+    Object.keys(resources).forEach(resource => {
+      Object.keys(resources[resource].operations).forEach(operation => {
         expect(tasks[resource][operation]).to.be.a('function');
         expect(tasks[resource][operation].success).to.be.a('function');
         expect(tasks[resource][operation].failure).to.be.a('function');
