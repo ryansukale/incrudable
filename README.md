@@ -15,8 +15,13 @@ import incrudable from 'incrudable/redux-thunk';
 const resources = {
   albums: {
     name: 'albums',
-    singular: 'album',
-    basePath: '/data/albums'
+    operations: {
+      create: '/api/albums',
+      read: '/api/albums/:id'
+      update: '/api/albums/:id',
+      del: '/api/albums/:id',
+      list: '/api/albums'
+    }
   }
 };
 
@@ -24,45 +29,30 @@ export * from incrudable(resources);
 
 /** This returns an object with the following properties
 {
-  albums: {
-    actions: {
-      create: {success: f() , error: f(), wait: f()}
-      read: {success: f() , error: f(), wait: f()}
-      update: {success: f() , error: f(), wait: f()}
-      del: {success: f() , error: f(), wait: f()}
-      list: {success: f() , error: f(), wait: f()}
-    }
-    thunks: {
-      createAlbum: f(),
-      readAlbum: f(),
-      updateAlbum: f(),
-      delAlbum: f(),
-      listAlbums: f()
-    }
-  }
+  create: f(), // Thunks
+  read: f(),
+  update: f(),
+  del: f(),
+  list: f()
 }
 */
 
 // You can use redux to dispatch
 
-import {albums} from 'modules/resources'
-const {
-  thunks: {createAlbum, listAlbums},
-  actions
-} = albums;
+import {albums} from 'modules/albums/resources'
 
 // ---------
 
 const payload = {body: {title: 'Elements of Life', genre: 'trance'}};
 dispatch(
-  createAlbum(payload, {actions: actions.create})
+  albums.create(payload, {actions: actions.create})
 );
 
 // ---------
 
 const payload = {query: {page: 10}};
 dispatch(
-  listAlbums(payload, {actions: actions.list})
+  albums.list(payload, {actions: actions.list})
 );
 
 ```
@@ -76,7 +66,6 @@ You can reuse thunks and export custom actions. This comes in handy when you wan
 import createActionGroup from 'incrudable/lib/createActionGroup';
 
 import {albums} from 'modules/albums/resources';
-const {thunks: {listAlbums}} = albums;
 
 // Create and export your application specific action group
 export const filterAlbumActions = createActionGroup('FILTER_BY_GENRE');
@@ -84,14 +73,14 @@ export const filterAlbumActions = createActionGroup('FILTER_BY_GENRE');
 // Reuse the list thunk, but dispatch your custom action groups
 const payload = {query: {genre: 'trance'}};
 dispatch(
-  listAlbums(payload, {actions: filterAlbumActions})
+  albums.list(payload, {actions: filterAlbumActions})
 );
 
 // In your reducers, you can listen as follows
 import {albums} from 'modules/albums/resources';
 import filterAlbumActions from 'modules/albums/filter';
 
-const {actions: {create}} = album;
+const {create} = albums;
 
 // Plain old switch based reducers
 function albumsReducer(state, {action, payload}) {
@@ -129,13 +118,24 @@ const resources = {
   albums: {
     name: 'albums',
     singular: 'album',
-    basePath: '/data/albums'
+    operations: {
+      create: '/api/albums',
+      read: '/api/albums/:id'
+      update: '/api/albums/:id',
+      del: '/api/albums/:id',
+      list: '/api/albums'
+    }
   },
   songs: {
     name: 'songs',
     singular: 'song',
-    basePath: '/data/songs',
-    operations: ['create', 'read']
+    operations: {
+      create: '/api/albums/:id/songs',
+      read: '/api/albums/:id/songs/:song-id'
+      update: '/api/albums/:id/songs/:song-id',
+      del: '/api/albums/:id/songs/:song-id',
+      list: '/api/albums/:id/songs'
+    }
   }
 };
 
@@ -150,11 +150,7 @@ export default incrudable(resources);
 To create tooling for resources individually
 
 ```js
-// With thunks
-const { actions, thunks } = incrudable.fromResource(albums);
-
-// With epics
-const { actions, epics } = incrudable.fromResource(albums);
+const albumsResource = incrudable.fromResource(albums);
 ```
 
 Available as an individual import as `import fromResource from 'incrudable/lib/fromResource'`;
@@ -171,7 +167,7 @@ export const createdByUser = incrudable.createActionGroup('ALBUMS_CREATED_BY_USE
 This generates an object with three named actions
 createdByUser = {
   success: f()...
-  error: f() ...
+  failure: f() ...
   wait: f()...
 };
 **/
@@ -184,7 +180,7 @@ function albumsReducer(state, {action, payload}) {
   switch (action) {
     case createdByUser.success:
       return {latest: payload};
-    case createdByUser.error:
+    case createdByUser.failure:
       return {errors: payload};
     case createdByUser.wait:
       return {isLoading: true};
@@ -204,29 +200,32 @@ Available as an individual import as `import createActionGroup from 'incrudable/
 
 export default incrudable.createCrudTasks({
   resource: 'albums',
-  singular: 'album',
-  basePath: '/api/albums',
-  operations: ['create', 'read', 'update', 'del', 'list']
+  operations: {
+    create: '/api/albums',
+    read: '/api/albums/:id'
+    update: '/api/albums/:id',
+    del: '/api/albums/:id',
+    list: '/api/albums'
+  }
 });
 
 // tasks/initDashboard.js
-import {list as listAlbums} from '../modules/jobs/tasks/crud';
-import jobActions from '../modules/jobs/actions';
+import albums from '../modules/albums/tasks/crud';
+import albumFilterActions from '../modules/albums/actions';
 
 dispatch(
-  listAlbums(
+  albums.list(
     {query: {created_by: 122}}
-    {actions: jobActions.createdByUser}
+    {actions: albumFilterActions.createdByUser}
   )
 );
 
 dispatch(
-  updateAlbum(
+  albums.update(
     {
       body: {title: 'By the rivers of Babylon'}
       params: {id: 10}
-    },
-    {actions: jobActions.createdByUser}
+    }
   )
 );
 ```
@@ -234,22 +233,3 @@ dispatch(
 Available as an individual import as `import createCrudTasks from 'incrudable/lib/createCrudTasks';`
 
 ---
-
-#### Additional Configuration
-
-If your endpoint is not restful, set `restful` as false and provide a `routes` hash and your tasks will use POST instead of restful methods
-
-```js
-export default createCrudTasks({
-  resource: 'albums',
-  singular: 'album',
-  restful: false
-  routes: {
-    create: '/api/jobs/create',
-    read: '/api/jobs/read'
-    update: '/api/jobs/update',
-    del: '/api/jobs/del',
-    list: '/api/jobs/list'
-  }
-});
-```
