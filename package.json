@@ -12,6 +12,7 @@
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
     "build": "npm run clean && npm run build:commonjs && npm run build:es",
+    "prepare": "npm run clean && npm run build",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "lint": "xo",
     "test": "mocha --recursive --require babel-core/register tests/"
@@ -20,7 +21,7 @@
     "type": "git",
     "url": "git+https://github.com/ryansukale/incrudable.git"
   },
-  "author": "ryansukale@gmail.com",
+  "author": "Ryan Sukale <ryansukale@gmail.com> (https://github.com/ryansukale)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ryansukale/incrudable/issues"
