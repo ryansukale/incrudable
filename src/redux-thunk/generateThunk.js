@@ -10,12 +10,12 @@ function getThunkCreator(ajaxMethodName, config, {ajax}) {
         url,
         actions,
         onSuccess = onJsonApiResponse,
-        onError = onJsonApiError
+        onFailure = onJsonApiError
       } = config;
 
       actions.wait && dispatch(actions.wait());
       
-      const handlerConfig = {actions, dispatch, onError, done};
+      const handlerConfig = {actions, dispatch, onFailure, done};
       const fullUrl = createUrl(url, {
         params: request.params,
         query: request.query
@@ -26,7 +26,7 @@ function getThunkCreator(ajaxMethodName, config, {ajax}) {
           return onSuccess(handlerConfig, request, response)
         })
         .catch((errors) => {
-          return onError(handlerConfig, request, response);
+          return onFailure(handlerConfig, request, errors);
         });
     }
   }
@@ -50,7 +50,7 @@ export default function generateThunk({
   operation,
   actions,
   onSuccess,
-  onError,
+  onFailure,
   url
 }, config = {}) {
   const operationName = operation.toLowerCase();
@@ -61,5 +61,5 @@ export default function generateThunk({
 
   config.ajax = config.ajax || defaultAjax;
 
-  return generator({url, actions, onSuccess, onError}, config);
+  return generator({url, actions, onSuccess, onFailure}, config);
 }

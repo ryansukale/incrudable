@@ -51,7 +51,28 @@ describe('generateThunk', function () {
 
         expect(config.ajax.postJSON.calledOnce);
         expect(config.ajax.postJSON.firstCall.args[0]).to.equal('/users');
-      })
+      });
+  });
+
+  it('generates thunk for `read` operation that dispatches all the actions', function () {
+    const options = {
+      operation: 'read',
+      actions: createMockActions(),
+      url: '/users/:id'
+    };
+    const config = {ajax: createMockAjax()};
+    const dispatch = sinon.spy();
+    const thunk = generateThunk(options, config)({params: {id: '10'}});
+
+    return thunk(dispatch)
+      .then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.getJSON.calledOnce);
+        expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users/10');
+      });
   });
 
   it('generates thunk for `update` operation that dispatches all the actions', function () {
@@ -72,7 +93,7 @@ describe('generateThunk', function () {
 
         expect(config.ajax.putJSON.calledOnce);
         expect(config.ajax.putJSON.firstCall.args[0]).to.equal('/users/10');
-      })
+      });
   });
 
   it('generates thunk for `delete` operation that dispatches all the actions', function () {
@@ -93,7 +114,7 @@ describe('generateThunk', function () {
 
         expect(config.ajax.delJSON.calledOnce);
         expect(config.ajax.delJSON.firstCall.args[0]).to.equal('/users/10');
-      })
+      });
   });
 
   it('generates thunk for `list` operation that dispatches all the actions', function () {
@@ -119,27 +140,6 @@ describe('generateThunk', function () {
 
   it('invokes custom onSuccess', function () {
     const options = {
-      operation: 'list',
-      actions: createMockActions(),
-      url: '/users'
-    };
-    const config = {ajax: createMockAjax()};
-    const dispatch = sinon.spy();
-    const thunk = generateThunk(options, config)({query: {sort_by: 'age'}});
-
-    return thunk(dispatch)
-      .then(() => {
-        expect(options.actions.wait.calledOnce).to.equal(true);
-        expect(options.actions.success.calledOnce).to.equal(true);
-        expect(dispatch.calledTwice).to.equal(true);
-
-        expect(config.ajax.getJSON.calledOnce);
-        expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users?sort_by=age');
-      });
-  });
-
-  it('generates thunk for `read` operation that dispatches all the actions', function () {
-    const options = {
       operation: 'read',
       actions: createMockActions(),
       url: '/users/:id',
@@ -156,9 +156,35 @@ describe('generateThunk', function () {
         
         const args = options.onSuccess.firstCall.args;
 
-        expect(args[0]).to.have.all.keys('actions', 'dispatch', 'onError', 'done');
+        expect(args[0]).to.have.all.keys('actions', 'dispatch', 'onFailure', 'done');
         expect(args[1]).to.equal(request);
         expect(args[2]).to.equal('getJSON');
-      })
+      });
+  });
+
+  it('invokes custom onFailure', function () {
+    const options = {
+      operation: 'read',
+      actions: createMockActions(),
+      url: '/users/:id',
+      onFailure: sinon.spy()
+    };
+    const request = {params: {id: '10'}};
+    const config = {ajax: {
+      getJSON: sinon.stub().returns(Promise.reject('getJSON')),
+    }};
+    const dispatch = sinon.spy();
+    const thunk = generateThunk(options, config)(request);
+
+    return thunk(dispatch)
+      .then(() => {
+        expect(options.onFailure.calledOnce);
+        
+        const args = options.onFailure.firstCall.args;
+
+        expect(args[0]).to.have.all.keys('actions', 'dispatch', 'onFailure', 'done');
+        expect(args[1]).to.equal(request);
+        expect(args[2]).to.equal('getJSON');
+      });
   });
 });

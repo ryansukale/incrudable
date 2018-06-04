@@ -11,7 +11,7 @@ export function onJsonApiResponse({actions, dispatch, onError, done}, request, r
   return undefined;
 }
 
-export function onJsonApiError({actions, dispatch, done}, request, response) {
+export function onJsonApiError({actions, dispatch, done}, request, errors) {
   const payload = {request, errors};
   actions.failure && dispatch(actions.failure(payload));
   done && done(payload);
