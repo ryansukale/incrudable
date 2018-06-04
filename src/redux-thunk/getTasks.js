@@ -2,11 +2,13 @@ import generateThunk from './generateThunk';
 
 export default function getThunks(resource, actionGroups, config) {
   return Object.keys(actionGroups).reduce((acc, operation) => {
+    const url = resource.operations[operation];
     const actions = actionGroups[operation];
+
     const thunk = generateThunk({
       operation,
       actions,
-      url: 'TODO' // resource.basePath
+      url
     }, config);
 
     Object.keys(actions).reduce((target, actionName) => {

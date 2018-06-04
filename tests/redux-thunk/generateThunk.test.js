@@ -136,6 +136,6 @@ describe('generateThunk', function () {
 
         expect(config.ajax.getJSON.calledOnce);
         expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users?sort_by=age');
-      })
+      });
   });
 });
