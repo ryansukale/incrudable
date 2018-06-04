@@ -13,6 +13,6 @@ export function onJsonApiResponse({actions, dispatch, onError, done}, request, r
 
 export function onJsonApiError({actions, dispatch, done}, request, response) {
   const payload = {request, errors};
-  actions.fail && dispatch(actions.fail(payload));
+  actions.failure && dispatch(actions.failure(payload));
   done && done(payload);
 }

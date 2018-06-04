@@ -27,8 +27,8 @@ const resources = {
       create: '/albums/:id/songs',
       read: '/albums/:id/songs/:song_id',
       update: '/albums/:id/songs/:song_id',
-      del: '/abums/:id/:id/songs/:song_id',
-      list: '/abums/:id/:id/songs'
+      del: '/albums/:id/songs/:song_id',
+      list: '/albums/:id/songs'
     }
   },
 }
