@@ -2,11 +2,16 @@
   "name": "incrudable",
   "version": "0.0.1",
   "description": "Crud helpers for rxjs and redux based applications",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "es/index.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
-    "clean": "rimraf lib",
-    "build:commonjs": "babel src --out-dir lib",
-    "build": "npm run clean && npm run build:commonjs",
+    "clean": "rimraf lib es",
+    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
+    "build": "npm run clean && npm run build:commonjs && npm run build:es",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "lint": "xo",
     "test": "mocha --recursive --require babel-core/register tests/"
@@ -24,6 +29,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "cross-env": "^5.1.6",
     "mocha": "^5.1.1",
     "rimraf": "^2.6.2",
     "sinon": "^5.0.10",
