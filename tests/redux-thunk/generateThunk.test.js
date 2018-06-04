@@ -3,19 +3,6 @@ import sinon from 'sinon';
 
 import generateThunk from '../../src/redux-thunk/generateThunk';
 
-const resources = {
-  albums: {
-    name: 'albums',
-    singular: 'album',
-    basePath: '/data/albums'
-  },
-  songs: {
-    name: 'songs',
-    singular: 'song',
-    basePath: '/data/songs'
-  },
-}
-
 function createMockActions() {
   return ['wait', 'success', 'fail'].reduce((acc, type) => {
     acc[type] = sinon.stub().returns(type) // () => {console.log(type); sinon.stub().returns(type)();}
