@@ -1,4 +1,5 @@
-// TODO: Refactor this
+import fetch from 'whatwg-fetch';
+// FUTURE: Refactor this
 
 export default {
   getJSON(url) {

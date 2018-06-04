@@ -11,7 +11,8 @@ export default function createActionGroup(
   options,
   statusTypes = DEFAULT_STATUS_TYPES
 ) {
-  let base, prefix;
+  let base;
+  let prefix;
   if (typeof options === 'string') {
     base = options;
   } else {

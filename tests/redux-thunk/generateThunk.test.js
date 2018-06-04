@@ -1,3 +1,4 @@
+/* global describe, it */
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -108,7 +109,7 @@ describe('generateThunk', () => {
     };
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
-    const thunk = generateThunk(options, config)({ query: { sort_by: 'age' } });
+    const thunk = generateThunk(options, config)({ query: { sort: 'age' } });
 
     return thunk(dispatch).then(() => {
       expect(options.actions.wait.calledOnce).to.equal(true);
@@ -116,9 +117,7 @@ describe('generateThunk', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
-        '/users?sort_by=age'
-      );
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users?sort=age');
     });
   });
 

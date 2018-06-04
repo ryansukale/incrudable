@@ -1,5 +1,5 @@
+/* global describe, it */
 import { expect } from 'chai';
-import sinon from 'sinon';
 
 import getTasks from '../../src/redux-thunk/getTasks';
 import getActions from '../../src/getActions';

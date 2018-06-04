@@ -37,13 +37,14 @@
     "babel-preset-env": "^1.6.1",
     "batarang": "^2.0.12",
     "redux-actions": "^2.3.0",
-    "webpack": "^4.6.0"
+    "webpack": "^4.6.0",
+    "whatwg-fetch": "^2.0.4"
   },
   "xo": {
     "prettier": true,
     "space": true,
     "rules": {
-      "bracketSpacing": false,
+      "prefer-promise-reject-errors": 0,
       "unicorn/filename-case": [
         "error",
         {

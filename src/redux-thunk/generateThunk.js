@@ -4,7 +4,7 @@ import { onJsonApiResponse, onJsonApiError } from './handlers';
 import defaultAjax from './ajax';
 
 function getThunkCreator(ajaxMethodName, config, { ajax }) {
-  return function createThunk(request, done) {
+  return function(request, done) {
     return dispatch => {
       const {
         url,
@@ -13,7 +13,9 @@ function getThunkCreator(ajaxMethodName, config, { ajax }) {
         onFailure = onJsonApiError
       } = config;
 
-      actions.wait && dispatch(actions.wait());
+      if (actions.wait) {
+        dispatch(actions.wait());
+      }
 
       const handlerConfig = { actions, dispatch, onFailure, done };
       const fullUrl = createUrl(url, {
@@ -56,7 +58,7 @@ export default function generateThunk(
     throw new Error(
       `operation should be one of ${Object.keys(
         thunkGenerators
-      )}. Received: ${type}`
+      )}. Received: ${operation}`
     );
   }
 

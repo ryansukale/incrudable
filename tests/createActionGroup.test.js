@@ -1,3 +1,4 @@
+/* global describe, it */
 import { expect } from 'chai';
 
 import createActionGroup from '../src/createActionGroup';
@@ -15,6 +16,7 @@ describe('createActionGroup', () => {
     expect(Object.keys(actionGroup)).to.deep.equal(statusTypes);
     statusTypes.map(type => {
       expect(actionGroup[type]).to.be.a('function');
+      return undefined;
     });
   });
 
@@ -26,6 +28,7 @@ describe('createActionGroup', () => {
     expect(Object.keys(actionGroup)).to.have.members(statusTypes);
     statusTypes.map(type => {
       expect(actionGroup[type]).to.be.a('function');
+      return undefined;
     });
   });
 
@@ -36,6 +39,7 @@ describe('createActionGroup', () => {
     expect(Object.keys(actionGroup)).to.have.members(statusTypes);
     statusTypes.map(type => {
       expect(actionGroup[type]).to.be.a('function');
+      return undefined;
     });
   });
 });

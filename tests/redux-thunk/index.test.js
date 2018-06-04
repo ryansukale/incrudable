@@ -1,3 +1,4 @@
+/* global describe, it */
 import { expect } from 'chai';
 
 import incrudable from '../../src/redux-thunk';

@@ -3,7 +3,7 @@ export function onJsonApiResponse(
   request,
   response
 ) {
-  const { errors, data } = response;
+  const { errors } = response;
   if (errors) {
     onError({ actions, dispatch, done }, request, errors);
     return undefined;
@@ -11,12 +11,18 @@ export function onJsonApiResponse(
 
   const payload = { request, response };
   dispatch(actions.success(payload));
-  done && done(null, payload);
+  if (done) {
+    done(null, payload);
+  }
   return undefined;
 }
 
 export function onJsonApiError({ actions, dispatch, done }, request, errors) {
   const payload = { request, errors };
-  actions.failure && dispatch(actions.failure(payload));
-  done && done(payload);
+  if (actions.failure) {
+    dispatch(actions.failure(payload));
+  }
+  if (done) {
+    done(payload);
+  }
 }
