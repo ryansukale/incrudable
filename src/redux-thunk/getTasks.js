@@ -1,11 +1,11 @@
 import generateThunk from './generateThunk';
 
-export default function getThunks(resource, actionGroups, config) {
+export default function getTasks(resource, actionGroups, config) {
   return Object.keys(actionGroups).reduce((acc, operation) => {
     const url = resource.operations[operation];
     const actions = actionGroups[operation];
 
-    const thunk = generateThunk(
+    const task = generateThunk(
       {
         operation,
         actions,
@@ -17,9 +17,9 @@ export default function getThunks(resource, actionGroups, config) {
     Object.keys(actions).reduce((target, actionName) => {
       target[actionName] = actions[actionName];
       return target;
-    }, thunk);
+    }, task);
 
-    acc[operation] = thunk;
+    acc[operation] = task;
 
     return acc;
   }, {});
