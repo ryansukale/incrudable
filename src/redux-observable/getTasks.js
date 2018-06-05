@@ -14,7 +14,7 @@ function getThunkCreator(ajaxMethodName, config, { ajax }) {
       } = config;
 
       if (actions.wait) {
-        dispatch(actions.wait(request));
+        dispatch(actions.wait());
       }
 
       const handlerConfig = { actions, dispatch, onFailure, done };
@@ -48,7 +48,7 @@ const thunkGenerators = {
   list
 };
 
-export default function generateThunk(
+export default function generateEpic(
   { operation, actions, onSuccess, onFailure, url },
   config = {}
 ) {
