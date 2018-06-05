@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import generateThunk from '../../src/redux-thunk/generateThunk';
 
 function createMockActions() {
-  return ['wait', 'success', 'fail'].reduce((acc, type) => {
+  return ['wait', 'success', 'failure'].reduce((acc, type) => {
     acc[type] = sinon.stub().returns(type); // () => {console.log(type); sinon.stub().returns(type)();}
     return acc;
   }, {});

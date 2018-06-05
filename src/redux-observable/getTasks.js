@@ -1,68 +1,26 @@
-import createUrl from 'batarang/createUrl';
+import generateEpic from './generateEpic';
 
-import { onJsonApiResponse, onJsonApiError } from './handlers';
-import defaultAjax from './ajax';
+export default function getTasks(resource, actionGroups, config) {
+  return Object.keys(actionGroups).reduce((acc, operation) => {
+    const url = resource.operations[operation];
+    const actions = actionGroups[operation];
 
-function getThunkCreator(ajaxMethodName, config, { ajax }) {
-  return function(request, done) {
-    return dispatch => {
-      const {
-        url,
+    const task = generateEpic(
+      {
+        operation,
         actions,
-        onSuccess = onJsonApiResponse,
-        onFailure = onJsonApiError
-      } = config;
-
-      if (actions.wait) {
-        dispatch(actions.wait());
-      }
-
-      const handlerConfig = { actions, dispatch, onFailure, done };
-      const fullUrl = createUrl(url, {
-        params: request.params,
-        query: request.query
-      });
-
-      return ajax[ajaxMethodName](fullUrl, request)
-        .then(response => {
-          return onSuccess(handlerConfig, request, response);
-        })
-        .catch(errors => {
-          return onFailure(handlerConfig, request, errors);
-        });
-    };
-  };
-}
-
-const create = getThunkCreator.bind(null, 'postJSON');
-const read = getThunkCreator.bind(null, 'getJSON');
-const update = getThunkCreator.bind(null, 'putJSON');
-const del = getThunkCreator.bind(null, 'delJSON');
-const list = read;
-
-const thunkGenerators = {
-  create,
-  read,
-  update,
-  del,
-  list
-};
-
-export default function generateEpic(
-  { operation, actions, onSuccess, onFailure, url },
-  config = {}
-) {
-  const operationName = operation.toLowerCase();
-  const generator = thunkGenerators[operationName];
-  if (!generator) {
-    throw new Error(
-      `operation should be one of ${Object.keys(
-        thunkGenerators
-      )}. Received: ${operation}`
+        url
+      },
+      config
     );
-  }
 
-  config.ajax = config.ajax || defaultAjax;
+    Object.keys(actions).reduce((target, actionName) => {
+      target[actionName] = actions[actionName];
+      return target;
+    }, task);
 
-  return generator({ url, actions, onSuccess, onFailure }, config);
+    acc[operation] = task;
+
+    return acc;
+  }, {});
 }
