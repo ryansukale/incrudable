@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 
 import getTasks from '../../src/redux-thunk/getTasks';
-import getActions from '../../src/getActions';
+import getActionGroups from '../../src/getActionGroups';
 
 const resources = {
   albums: {
@@ -18,7 +18,7 @@ describe('getTasks', () => {
   it('generates tasks for the resources', () => {
     const { albums } = resources;
 
-    const actionGroups = getActions(albums, albums.operations);
+    const actionGroups = getActionGroups(albums, albums.operations);
     const tasks = getTasks(albums, actionGroups);
 
     expect(tasks.create).to.be.a('function');

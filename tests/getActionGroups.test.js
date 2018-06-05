@@ -1,16 +1,16 @@
 /* global describe, it */
 import { expect } from 'chai';
 
-import getActions from '../src/getActions';
+import getActionGroups from '../src/getActionGroups';
 
 const operations = {
   create: '/albums/:id/songs',
   read: '/albums/:id/songs/:song_id'
 };
 
-describe('getActions', () => {
+describe('getActionGroups', () => {
   it('returns action groups for the given operations', () => {
-    const actions = getActions('albums', operations);
+    const actions = getActionGroups('albums', operations);
     const subgroups = ['failure', 'success', 'wait'];
 
     const actionGroupNames = Object.keys(actions);
