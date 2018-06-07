@@ -33,13 +33,15 @@ import { combineEpics } from 'redux-observable';
 
 const epicGenerators = {
   create({ url, actions, onSuccess, onFailure }, { ajax }) {
-    function waitAction(request) {
+    function task(request) {
       return actions.wait(request);
     }
     function successEpic(action$) {
-      return action$.pipe(
+      return action$
+        .ofType(actions.wait)
+        .pipe(
         map(
-          (req) => actions.success({request, response: 'TODO'})
+          ({payload: request}) => actions.success({request, response: 'TODO'})
         )
       );
       // return action$
@@ -47,14 +49,16 @@ const epicGenerators = {
     }
 
     function failureEpic(action$) {
-      return action$.pipe(
-        map((response) => actions.failure({request, error: 'TODO'}))
+      return action$
+        .ofType(actions.wait)
+        .pipe(
+        map((response) => actions.failure({request: 'TODO', error: 'TODO'}))
       );
     }
     
-    waitAction.epics = combineEpics(successEpic, failureEpic);
+    task.epics = combineEpics(successEpic, failureEpic);
 
-    return waitAction;
+    return task;
   }
 };
 
