@@ -1,6 +1,9 @@
 /* global describe, it */
 import { expect } from 'chai';
 import sinon from 'sinon';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 
 import generateEpic from '../../src/redux-observable/generateEpic';
 
@@ -21,7 +24,7 @@ function createMockAjax() {
 }
 
 describe('generateEpic', () => {
-  it('generates task for `create` along with the corresponding epics', () => {
+  it('generates task for `create` along with the corresponding epics', (done) => {
     const options = {
       operation: 'create',
       actions: createMockActions(),
@@ -31,9 +34,25 @@ describe('generateEpic', () => {
     const request = { body: 'hello' };
 
     const create = generateEpic(options, config);
-    expect(create(request)).to.equal(options.actions.wait(request));
-    expect(create.epics).to.be.a('function');
+    const action = create(request);
+
+    expect(action).to.equal(options.actions.wait(request));
+
+    const {epics} = create;
+    expect(epics).to.be.a('function');
     
+    const action$ = of(action);
+
+    // action$.map(d => console.log(d));
+    // const epics(action$);
+
+
+    action$.subscribe((data) => {
+      // epics(action$);
+      // console.log('data', data);
+      expect(options.actions.success.calledOnce).to.equal(true);
+      // done();
+    });
 
     // task().subscribe()
 

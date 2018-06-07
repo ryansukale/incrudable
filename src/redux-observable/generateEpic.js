@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { combineEpics } from 'redux-observable';
 // function getEpicCreator(ajaxMethodName, config, { ajax }) {
 //   const {
@@ -32,17 +33,28 @@ import { combineEpics } from 'redux-observable';
 
 const epicGenerators = {
   create({ url, actions, onSuccess, onFailure }, { ajax }) {
+    function waitAction(request) {
+      return actions.wait(request);
+    }
     function successEpic(action$) {
-
+      return action$.pipe(
+        map(
+          (req) => actions.success({request, response: 'TODO'})
+        )
+      );
+      // return action$
+        
     }
 
     function failureEpic(action$) {
-
+      return action$.pipe(
+        map((response) => actions.failure({request, error: 'TODO'}))
+      );
     }
     
-    actions.wait.epics = combineEpics(successEpic, failureEpic);
+    waitAction.epics = combineEpics(successEpic, failureEpic);
 
-    return actions.wait;
+    return waitAction;
   }
 };
 
