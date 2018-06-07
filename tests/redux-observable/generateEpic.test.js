@@ -42,11 +42,11 @@ describe('generateEpic', () => {
     const request = { body: 'hello' };
 
     const create = generateEpic(options, config);
-    const {epics} = create;
+    const {epic} = create;
 
-    expect(epics).to.be.a('function');
+    expect(epic).to.be.a('function');
 
-    const epicMiddleware = createEpicMiddleware(epics);
+    const epicMiddleware = createEpicMiddleware(epic);
     const mockStore = configureMockStore([epicMiddleware]);
     const store = mockStore();
     const action = create(request);
@@ -63,29 +63,5 @@ describe('generateEpic', () => {
       type: options.actions.success.toString(),
       payload: {request, response: 'TODO'}
     });
-    
-    // const action$ = of(action);
-
-    // action$.map(d => console.log(d));
-    // const epics(action$);
-
-
-    // action$.subscribe((data) => {
-    //   // epics(action$);
-    //   // console.log('data', data);
-    //   expect(options.actions.success.calledOnce).to.equal(true);
-    //   // done();
-    // });
-
-    // task().subscribe()
-
-    // return task().then(() => {
-    //   expect(options.actions.wait.calledOnce).to.equal(true);
-    //   // expect(options.actions.success.calledOnce).to.equal(true);
-    //   // expect(dispatch.calledTwice).to.equal(true);
-
-    //   // expect(config.ajax.postJSON.calledOnce);
-    //   // expect(config.ajax.postJSON.firstCall.args[0]).to.equal('/users');
-    // });
   });
 });

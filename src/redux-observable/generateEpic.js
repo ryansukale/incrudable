@@ -36,7 +36,7 @@ const epicGenerators = {
     function task(request) {
       return actions.wait(request);
     }
-    function successEpic(action$) {
+    function epic(action$) {
       return action$
         .ofType(actions.wait)
         .pipe(
@@ -48,15 +48,15 @@ const epicGenerators = {
         
     }
 
-    function failureEpic(action$) {
-      return action$
-        .ofType(actions.wait)
-        .pipe(
-        map((response) => actions.failure({request: 'TODO', error: 'TODO'}))
-      );
-    }
+    // function failureEpic(action$) {
+    //   return action$
+    //     .ofType(actions.wait)
+    //     .pipe(
+    //     map((response) => actions.failure({request: 'TODO', error: 'TODO'}))
+    //   );
+    // }
     
-    task.epics = combineEpics(successEpic, failureEpic);
+    task.epic = epic; //combineEpics(successEpic, failureEpic);
 
     return task;
   }
