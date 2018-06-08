@@ -1,8 +1,8 @@
 /* global describe, it */
 import { expect } from 'chai';
 import sinon from 'sinon';
-// import { Observable, of } from 'rxjs';
-// import { map } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { map, switchMap, merge, tap } from 'rxjs/operators';
 
 import configureMockStore from 'redux-mock-store';
 import { createEpicMiddleware } from 'redux-observable';
@@ -24,10 +24,10 @@ import generateEpic from '../../src/redux-observable/generateEpic';
 
 function createMockAjax() {
   return {
-    postJSON: sinon.stub().returns(Promise.resolve('postJSON')),
-    getJSON: sinon.stub().returns(Promise.resolve('getJSON')),
-    putJSON: sinon.stub().returns(Promise.resolve('putJSON')),
-    delJSON: sinon.stub().returns(Promise.resolve('delJSON'))
+    postJSON: () => Promise.resolve('postJSON'),
+    getJSON: () => Promise.resolve('getJSON'),
+    putJSON: () => Promise.resolve('putJSON'),
+    delJSON: () => Promise.resolve('delJSON')
   };
 }
 
@@ -50,17 +50,29 @@ describe('generateEpic', () => {
     const mockStore = configureMockStore([epicMiddleware]);
     const store = mockStore();
     const action = create(request);
+
+    // --- Working example----
+    //  const source$ = of(1);
+    // const network$ = from(config.ajax.getJSON('TEST'));
+    // source$
+    //   .pipe(
+    //     switchMap((response) => network$),
+    //     tap(response => console.log('response', response))
+    //   ).subscribe(val => console.log('val', val));
+    //   --- Working example----
+
     store.dispatch(action);
     const storeActions = store.getActions();
 
+    expect(storeActions.length).to.equal(2);
     expect(action).to.deep.equal(options.actions.wait(request));
     expect(storeActions[0]).to.deep.equal({
-      type: options.actions.wait.toString(),
+      type: `${options.actions.wait}`,
       payload: request
     });
 
     expect(storeActions[1]).to.deep.equal({
-      type: options.actions.success.toString(),
+      type: `${options.actions.success}`,
       payload: {request, response: 'TODO'}
     });
   });

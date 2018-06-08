@@ -1,51 +1,32 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { map, pipe, switchMap, tap } from 'rxjs/operators';
 import { combineEpics } from 'redux-observable';
-// function getEpicCreator(ajaxMethodName, config, { ajax }) {
-//   const {
-//     url,
-//     actions,
-//     onSuccess = onJsonApiResponse,
-//     onFailure = onJsonApiError
-//   } = config;
-
-//   function waitAction(request, done) {
-//     const {actions} = config;
-//     return actions.wait(request));
-//   }
-
-//   function success(action$) {
-//     action$
-//       .ofType(actions.wait)
-//       .switchMap(({payload}) => ajax[ajaxMethodName](fullUrl, payload))
-//       .map((response) => onSuccess(handlerConfig, request, response));
-//   }
-
-//   return waitAction;
-// }
-
-
-// const create = getEpicCreator.bind(null, 'postJSON');
-// const read = getThunkCreator.bind(null, 'getJSON');
-// const update = getThunkCreator.bind(null, 'putJSON');
-// const del = getThunkCreator.bind(null, 'delJSON');
-// const list = read;
 
 const epicGenerators = {
   create({ url, actions, onSuccess, onFailure }, { ajax }) {
     function task(request) {
       return actions.wait(request);
     }
+
+    function submit({payload: request}) {
+      return from(ajax.getJSON(request))
+        .pipe(
+          map((response) =>({request, response}))
+        );
+    }
+
+    function onJsonApiResponse({actions, payload}) {
+      console.log('payload', payload);
+      return actions.success(payload);
+    }
+
     function epic(action$) {
       return action$
-        .ofType(actions.wait)
+        .ofType(actions.wait) // TODO: before handler
         .pipe(
-        map(
-          ({payload: request}) => actions.success({request, response: 'TODO'})
-        )
-      );
-      // return action$
-        
+          switchMap(submit),
+          map((payload) => onJsonApiResponse({actions, payload}))
+        );
     }
 
     // function failureEpic(action$) {
