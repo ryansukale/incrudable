@@ -11,29 +11,30 @@ const epicGenerators = {
     function submit({payload: request}) {
       return from(ajax.getJSON(request))
         .pipe(
-          map((response) =>({request, response})),
-          map((payload) => onJsonApiResponse({actions, payload})),
-          catchError((error) => of(actions.failure({request, response: error})))
-          // catchError((error) => from(error))
-
-          // catchError(error => { console.log(error); return from(actions.failure(error))}),
+          map(
+            (response) => onJsonApiResponse({actions, payload: {request, response}})
+          ),
+          catchError(
+            (response) => of(
+              onJsonApiError({actions, payload: {request, response}})
+            )
+          )
         );
     }
 
     function onJsonApiResponse({actions, payload}) {
-      console.log('got to success');
       return actions.success(payload);
+    }
+
+    function onJsonApiError({actions, payload}) {
+      return actions.failure(payload);
     }
 
     function epic(action$) {
       return action$
         .pipe(
           filter(actions.wait),
-          switchMap(submit),
-          // catchError((error) => of(actions.failure(error)))
-          // catchError(error => { console.log(error); return from(actions.failure(error))}),
-          // map((payload) => onJsonApiResponse({actions, payload})),
-          // catchError(()=> onJsonApiResponse({actions, payload: 'payload'}))
+          switchMap(submit)
         );
     }
     
