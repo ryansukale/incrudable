@@ -1,5 +1,5 @@
-import { Observable, from } from 'rxjs';
-import { map, pipe, switchMap, tap, filter } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { map, filter, switchMap, catchError } from 'rxjs/operators';
 // import { combineEpics } from 'redux-observable';
 
 const epicGenerators = {
@@ -11,11 +11,17 @@ const epicGenerators = {
     function submit({payload: request}) {
       return from(ajax.getJSON(request))
         .pipe(
-          map((response) =>({request, response}))
+          map((response) =>({request, response})),
+          map((payload) => onJsonApiResponse({actions, payload})),
+          catchError((error) => of(actions.failure({request, response: error})))
+          // catchError((error) => from(error))
+
+          // catchError(error => { console.log(error); return from(actions.failure(error))}),
         );
     }
 
     function onJsonApiResponse({actions, payload}) {
+      console.log('got to success');
       return actions.success(payload);
     }
 
@@ -24,7 +30,10 @@ const epicGenerators = {
         .pipe(
           filter(actions.wait),
           switchMap(submit),
-          map((payload) => onJsonApiResponse({actions, payload}))
+          // catchError((error) => of(actions.failure(error)))
+          // catchError(error => { console.log(error); return from(actions.failure(error))}),
+          // map((payload) => onJsonApiResponse({actions, payload})),
+          // catchError(()=> onJsonApiResponse({actions, payload: 'payload'}))
         );
     }
     
