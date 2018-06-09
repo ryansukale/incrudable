@@ -6,15 +6,6 @@ import sinon from 'sinon';
 import createActionGroup from '../../src/createActionGroup';
 import generateEpic from '../../src/redux-observable/generateEpic';
 
-function createMockAjax() {
-  return {
-    postJSON: () => Promise.resolve('postJSON'),
-    getJSON: () => Promise.resolve('getJSON'),
-    putJSON: () => Promise.resolve('putJSON'),
-    delJSON: () => Promise.resolve('delJSON')
-  };
-}
-
 describe('generateEpic', () => {
   it('generates task for `create` along with the corresponding epics', (done) => {
     const options = {
@@ -26,8 +17,9 @@ describe('generateEpic', () => {
     sinon.spy(options.actions, 'wait');
     sinon.spy(options.actions, 'success');
 
-    const config = { ajax: createMockAjax() };
     const request = { body: 'hello' };
+    const response = { body: 'test'};
+    const config = { ajax: {getJSON: () => Promise.resolve(response)} };
 
     const create = generateEpic(options, config);
     const {epic} = create;
@@ -40,7 +32,7 @@ describe('generateEpic', () => {
       expect(options.actions.wait.args[0][0]).to.deep.equal(request);
       expect(options.actions.success.args[0][0]).to.deep.equal({
         request,
-        response: 'getJSON'
+        response
       });
       done();
     });
