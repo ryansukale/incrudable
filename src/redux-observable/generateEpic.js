@@ -1,5 +1,5 @@
 import { Observable, from } from 'rxjs';
-import { map, pipe, switchMap, tap } from 'rxjs/operators';
+import { map, pipe, switchMap, tap, filter } from 'rxjs/operators';
 import { combineEpics } from 'redux-observable';
 
 const epicGenerators = {
@@ -16,14 +16,13 @@ const epicGenerators = {
     }
 
     function onJsonApiResponse({actions, payload}) {
-      console.log('payload', payload);
       return actions.success(payload);
     }
 
     function epic(action$) {
       return action$
-        .ofType(actions.wait) // TODO: before handler
         .pipe(
+          filter(actions.wait),
           switchMap(submit),
           map((payload) => onJsonApiResponse({actions, payload}))
         );
