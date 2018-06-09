@@ -1,6 +1,6 @@
 import { Observable, from } from 'rxjs';
 import { map, pipe, switchMap, tap, filter } from 'rxjs/operators';
-import { combineEpics } from 'redux-observable';
+// import { combineEpics } from 'redux-observable';
 
 const epicGenerators = {
   create({ url, actions, onSuccess, onFailure }, { ajax }) {
@@ -27,16 +27,8 @@ const epicGenerators = {
           map((payload) => onJsonApiResponse({actions, payload}))
         );
     }
-
-    // function failureEpic(action$) {
-    //   return action$
-    //     .ofType(actions.wait)
-    //     .pipe(
-    //     map((response) => actions.failure({request: 'TODO', error: 'TODO'}))
-    //   );
-    // }
     
-    task.epic = epic; //combineEpics(successEpic, failureEpic);
+    task.epic = epic;
 
     return task;
   }
