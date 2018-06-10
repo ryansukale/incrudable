@@ -1,11 +1,9 @@
-import generateThunk from './generateThunk';
-
-export default function getTasks(resource, actionGroups, config) {
+export default function getTasks(taskGenerator, resource, actionGroups, config) {
   return Object.keys(actionGroups).reduce((acc, operation) => {
     const url = resource.operations[operation];
     const actions = actionGroups[operation];
 
-    const task = generateThunk(
+    const task = taskGenerator(
       {
         operation,
         actions,

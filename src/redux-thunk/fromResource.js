@@ -1,9 +1,4 @@
-import getActionGroups from '../getActionGroups';
-import getTasks from './getTasks';
+import fromResource from '../fromResource';
+import generateThunk from './generateThunk';
 
-export default function fromResource(resource, config) {
-  const { operations } = resource;
-  const actionGroups = getActionGroups(resource, operations);
-
-  return getTasks(resource, actionGroups, config);
-}
+export default fromResource.bind(null, generateThunk);

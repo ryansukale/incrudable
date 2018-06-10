@@ -1,7 +1,7 @@
 /* global describe, it */
 import { expect } from 'chai';
 
-import getTasks from '../../src/redux-thunk/getTasks';
+import getTasks from '../../src/getTasks';
 import getActionGroups from '../../src/getActionGroups';
 
 const resources = {
