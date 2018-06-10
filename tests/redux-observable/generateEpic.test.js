@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import createActionGroup from '../../src/createActionGroup';
 import generateEpic from '../../src/redux-observable/generateEpic';
 
-describe.only('generateEpic', () => {
+describe('generateEpic', () => {
   function getTask(options, ajax) {
     sinon.spy(options.actions, 'wait');
     sinon.spy(options.actions, 'success');

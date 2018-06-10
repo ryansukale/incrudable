@@ -62,48 +62,6 @@ const epicGenerators = {
   list: read
 };
 
-// const epicGenerators = {
-//   create({ url, actions, onSuccess, onFailure }, { ajax }) {
-//     function task(request) {
-//       return actions.wait(request);
-//     }
-
-//     function submit({payload: request}) {
-//       return from(ajax.getJSON(request))
-//         .pipe(
-//           map(
-//             (response) => onJsonApiResponse({actions, payload: {request, response}})
-//           ),
-//           catchError(
-//             (response) => of(
-//               onJsonApiError({actions, payload: {request, response}})
-//             )
-//           )
-//         );
-//     }
-
-//     function onJsonApiResponse({actions, payload}) {
-//       return actions.success(payload);
-//     }
-
-//     function onJsonApiError({actions, payload}) {
-//       return actions.failure(payload);
-//     }
-
-//     function epic(action$) {
-//       return action$
-//         .pipe(
-//           filter(actions.wait),
-//           switchMap(submit)
-//         );
-//     }
-    
-//     task.epic = epic;
-
-//     return task;
-//   }
-// };
-
 export default function generateEpic(
   { operation, actions, onSuccess, onFailure, url },
   config = {}
