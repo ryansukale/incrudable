@@ -1,8 +1,9 @@
 /* global describe, it */
 import { expect } from 'chai';
+import sinon from 'sinon';
 
-import getTasks from '../../src/getTasks';
-import getActionGroups from '../../src/getActionGroups';
+import getTasks from '../src/getTasks';
+import getActionGroups from '../src/getActionGroups';
 
 const resources = {
   albums: {
@@ -15,11 +16,13 @@ const resources = {
 };
 
 describe('getTasks', () => {
-  it('generates tasks for the resources', () => {
+  it('generates tasks using a taskGenerator resources', () => {
     const { albums } = resources;
+    const mockGenerator = () => () => {};
+    const generatorSpy = sinon.spy(mockGenerator);
 
     const actionGroups = getActionGroups(albums, albums.operations);
-    const tasks = getTasks(albums, actionGroups);
+    const tasks = getTasks(generatorSpy, albums, actionGroups);
 
     expect(tasks.create).to.be.a('function');
     expect(tasks.create.success).to.equal(actionGroups.create.success);
@@ -30,5 +33,7 @@ describe('getTasks', () => {
     expect(tasks.read.success).to.equal(actionGroups.read.success);
     expect(tasks.read.failure).to.equal(actionGroups.read.failure);
     expect(tasks.read.wait).to.equal(actionGroups.read.wait);
+
+    expect(generatorSpy.getCalls().length).to.equal(2);
   });
 });

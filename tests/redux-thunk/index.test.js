@@ -26,7 +26,7 @@ const resources = {
   }
 };
 
-describe.only('incrudable', () => {
+describe('incrudable', () => {
   it('create the actions and tasks for resources', () => {
     const tasks = incrudable(resources);
 
