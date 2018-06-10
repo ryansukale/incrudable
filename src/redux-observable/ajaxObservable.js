@@ -1,6 +1,7 @@
-import * as Rx 'rx-lite-dom-ajax';
+import * as Rx from 'rx-lite-dom-ajax';
 
 function getJsonAjaxStream(settings) {
+  console.log('settings', settings)
   return Rx.DOM.ajax({
     ...settings,
     responseType: 'json'
@@ -11,14 +12,16 @@ export default {
   getJSON(url, options) {
     return getJsonAjaxStream({
       method: 'GET',
-      ...options
+      ...options,
+      url
     });
   },
   postJSON(url, { body, ...options }) {
     return getJsonAjaxStream({
-      method: 'GET',
+      url,
+      method: 'POST',
       body,
-      ...options
+      ...options,
     });
   }
 }
