@@ -1,6 +1,7 @@
 import { Observable, from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
-// import { combineEpics } from 'redux-observable';
+
+const defaultAjax = {};
 
 function epicGenerator(ajaxMethodName, config, { ajax }) {
   const {
