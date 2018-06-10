@@ -1,7 +1,7 @@
 import createUrl from 'batarang/createUrl';
 
 import { onJsonApiResponse, onJsonApiError } from './handlers';
-import defaultAjax from './ajax';
+import defaultAjax from './ajaxPromise';
 
 function getThunkCreator(ajaxMethodName, config, { ajax }) {
   return function(request, done) {

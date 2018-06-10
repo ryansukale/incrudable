@@ -15,7 +15,7 @@ export default {
   putJSON(url, { body, ...options }) {
     return fetch(url, {
       method: 'POST',
-      body: JSON.stringify(options.body),
+      body: JSON.stringify(body),
       ...options
     }).then(response => response.json());
   },

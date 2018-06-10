@@ -45,6 +45,7 @@
     "batarang": "^2.0.12",
     "redux-actions": "^2.3.0",
     "redux-observable": "^0.18.0",
+    "rx-lite-dom-ajax": "^7.0.3",
     "rxjs": "^6.2.0",
     "webpack": "^4.6.0",
     "whatwg-fetch": "^2.0.4"

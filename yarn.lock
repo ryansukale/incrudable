@@ -4646,6 +4646,12 @@ rx-lite-aggregates@^4.0.8:
   dependencies:
     rx-lite "*"
 
+rx-lite-dom-ajax@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/rx-lite-dom-ajax/-/rx-lite-dom-ajax-7.0.3.tgz#b6def55242c8cd7eee786ef5d48974fcb14e1c0b"
+  dependencies:
+    rx-lite "*"
+
 rx-lite@*, rx-lite@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-4.0.8.tgz#0b1e11af8bc44836f04a6407e92da42467b79444"
