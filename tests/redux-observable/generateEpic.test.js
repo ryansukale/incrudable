@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import createActionGroup from '../../src/createActionGroup';
-import generateEpic from '../../src/redux-observable/generateEpic';
+import generateEpic, {epicGenerator} from '../../src/redux-observable/generateEpic';
 
 describe('generateEpic', () => {
   function getTask(options, ajax) {
@@ -36,7 +36,7 @@ describe('generateEpic', () => {
         expect(options.actions.success.args[0][0]).to.deep.equal({request, response});
         done();
       });
-    })
+    });
 
     it('invokes the failure action on ajax error', (done) => {
       const options = {
@@ -56,7 +56,7 @@ describe('generateEpic', () => {
         expect(options.actions.failure.args[0][0]).to.deep.equal({request, response});
         done();
       });
-    })
+    });
   });
 
   describe('"read" operation', () => {
@@ -204,7 +204,7 @@ describe('generateEpic', () => {
         expect(options.actions.success.args[0][0]).to.deep.equal({request, response});
         done();
       });
-    })
+    });
 
     it('invokes the failure action on ajax error', (done) => {
       const options = {
@@ -224,6 +224,47 @@ describe('generateEpic', () => {
         expect(options.actions.failure.args[0][0]).to.deep.equal({request, response});
         done();
       });
-    })
+    });
+  });
+
+  describe.only('epicGenerator', () => {
+    it('invokes the custom onSuccess function', (done) => {
+      const actions = createActionGroup('LIST_ALBUMS');
+      const url = '/albums';
+      const request = { body: 'hello' };
+      const response = { body: [] };
+      const ajax = { getJSON: () => Promise.resolve(response) };
+
+      const onSuccess = sinon.spy(function ({actions, payload}) {
+        return {
+          type: 'CUSTOM_EVENT',
+          payload
+        };
+      })
+      const operation = epicGenerator('getJSON', { url, actions, onSuccess}, { ajax });
+      const {epic} = operation;
+
+      sinon.spy(actions, 'wait');
+      sinon.spy(actions, 'success');
+
+      const action$ = of(operation(request));
+
+      epic(action$).subscribe(() => {
+        expect(actions.wait.args[0][0]).to.deep.equal(request);
+        // Custom onSuccess is called
+        expect(onSuccess.calledOnce).to.equal(true);
+        // Default action is NOT called
+        expect(actions.success.called).to.equal(false);
+        done();
+      });
+    });
+
+    xit('invokes the custom onFailure function', (done) => {
+      
+    });
+
+    xit('invokes the custom beforeSubmit function', (done) => {
+      
+    });
   });
 });

@@ -2,13 +2,17 @@ import { Observable, from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
 
 const defaultAjax = {};
+function identity(request) {
+  return of(request);
+}
 
-function epicGenerator(ajaxMethodName, config, { ajax }) {
+export function epicGenerator(ajaxMethodName, config, { ajax }) {
   const {
     url,
     actions,
-    onSuccess,
-    onFailure
+    beforeSubmit = identity,
+    onSuccess = onJsonApiResponse,
+    onFailure = onJsonApiError
   } = config;
 
   function task(request) {
@@ -19,11 +23,11 @@ function epicGenerator(ajaxMethodName, config, { ajax }) {
     return from(ajax[ajaxMethodName](request))
       .pipe(
         map(
-          (response) => onJsonApiResponse({actions, payload: {request, response}})
+          (response) => onSuccess({actions, payload: {request, response}})
         ),
         catchError(
           (response) => of(
-            onJsonApiError({actions, payload: {request, response}})
+            onFailure({actions, payload: {request, response}})
           )
         )
       );
@@ -41,6 +45,7 @@ function epicGenerator(ajaxMethodName, config, { ajax }) {
     return action$
       .pipe(
         filter(actions.wait),
+        switchMap(beforeSubmit),
         switchMap(submit)
       );
   }
