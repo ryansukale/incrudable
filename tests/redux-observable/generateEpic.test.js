@@ -228,24 +228,34 @@ describe('generateEpic', () => {
   });
 
   describe.only('epicGenerator', () => {
-    it('invokes the custom onSuccess function', (done) => {
+    function prepareData({onSuccess, onFailure, ajax}) {
       const actions = createActionGroup('LIST_ALBUMS');
       const url = '/albums';
       const request = { body: 'hello' };
       const response = { body: [] };
-      const ajax = { getJSON: () => Promise.resolve(response) };
+      const config = {
+        ajax: ajax || { getJSON: () => Promise.resolve(response) }
+      };
 
+      const operation = epicGenerator('getJSON', { url, actions, onSuccess, onFailure}, config);
+      
+      sinon.spy(actions, 'wait');
+      sinon.spy(actions, 'success');
+      sinon.spy(actions, 'failure');
+
+      return {operation, request, actions};
+    }
+
+    it('invokes the custom onSuccess function', (done) => {
       const onSuccess = sinon.spy(function ({actions, payload}) {
         return {
           type: 'CUSTOM_EVENT',
           payload
         };
-      })
-      const operation = epicGenerator('getJSON', { url, actions, onSuccess}, { ajax });
+      });
+      
+      const {operation, request, actions} = prepareData({onSuccess});
       const {epic} = operation;
-
-      sinon.spy(actions, 'wait');
-      sinon.spy(actions, 'success');
 
       const action$ = of(operation(request));
 
@@ -259,8 +269,30 @@ describe('generateEpic', () => {
       });
     });
 
-    xit('invokes the custom onFailure function', (done) => {
+    it('invokes the custom onFailure function', (done) => {
+      const onFailure = sinon.spy(function ({actions, payload}) {
+        return {
+          type: 'CUSTOM_EVENT',
+          payload
+        };
+      });
       
+      const {operation, request, actions} = prepareData({
+        onFailure,
+        ajax: { getJSON: () => Promise.reject({}) }
+      });
+      const {epic} = operation;
+
+      const action$ = of(operation(request));
+
+      epic(action$).subscribe(() => {
+        expect(actions.wait.args[0][0]).to.deep.equal(request);
+        // Custom onFailure is called
+        expect(onFailure.calledOnce).to.equal(true);
+        // Default action is NOT called
+        expect(actions.failure.called).to.equal(false);
+        done();
+      });
     });
 
     xit('invokes the custom beforeSubmit function', (done) => {
