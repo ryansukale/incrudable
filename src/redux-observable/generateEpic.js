@@ -2,8 +2,8 @@ import { Observable, from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
 
 const defaultAjax = {};
-function identity(request) {
-  return of(request);
+function identity(data) {
+  return of(data);
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
@@ -69,7 +69,7 @@ const epicGenerators = {
 };
 
 export default function generateEpic(
-  { operation, actions, onSuccess, onFailure, url },
+  { operation, actions, onSuccess, onFailure, beforeSubmit, url },
   config = {}
 ) {
   const operationName = operation.toLowerCase();
@@ -84,5 +84,5 @@ export default function generateEpic(
 
   config.ajax = config.ajax || defaultAjax;
 
-  return generator({ url, actions, onSuccess, onFailure }, config);
+  return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, config);
 }

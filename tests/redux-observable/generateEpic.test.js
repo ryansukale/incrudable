@@ -228,7 +228,7 @@ describe('generateEpic', () => {
   });
 
   describe('epicGenerator', () => {
-    function prepareData({onSuccess, onFailure, ajax}) {
+    function prepareData({onSuccess, onFailure, beforeSubmit, ajax}) {
       const actions = createActionGroup('LIST_ALBUMS');
       const url = '/albums';
       const request = { body: 'hello' };
@@ -237,7 +237,13 @@ describe('generateEpic', () => {
         ajax: ajax || { getJSON: () => Promise.resolve(response) }
       };
 
-      const operation = epicGenerator('getJSON', { url, actions, onSuccess, onFailure}, config);
+      const operation = epicGenerator('getJSON', {
+        url,
+        actions,
+        onSuccess,
+        onFailure,
+        beforeSubmit
+      }, config);
       
       sinon.spy(actions, 'wait');
       sinon.spy(actions, 'success');
@@ -249,7 +255,7 @@ describe('generateEpic', () => {
     it('invokes the custom onSuccess function', (done) => {
       const onSuccess = sinon.spy(function ({actions, payload}) {
         return {
-          type: 'CUSTOM_EVENT',
+          type: 'CUSTOM_SUCCESS',
           payload
         };
       });
@@ -272,7 +278,7 @@ describe('generateEpic', () => {
     it('invokes the custom onFailure function', (done) => {
       const onFailure = sinon.spy(function ({actions, payload}) {
         return {
-          type: 'CUSTOM_EVENT',
+          type: 'CUSTOM_FAILURE',
           payload
         };
       });
@@ -295,8 +301,29 @@ describe('generateEpic', () => {
       });
     });
 
-    xit('invokes the custom beforeSubmit function', (done) => {
-      
+    it('invokes the custom beforeSubmit function', (done) => {
+      const suffix = 'modified_or_delayed';
+      const beforeSubmit = sinon.spy(function (request) {
+        return of({body: `${request.body}_${suffix}`});
+      });
+
+      const {operation, request, actions} = prepareData({
+        beforeSubmit,
+        ajax: { getJSON: () => Promise.resolve({}) }
+      });
+      const {epic} = operation;
+
+      const action$ = of(operation(request));
+
+      epic(action$).subscribe(() => {
+        expect(actions.wait.args[0][0]).to.deep.equal(request);
+        // Custom beforeSubmit is called
+        expect(beforeSubmit.calledOnce).to.equal(true);
+        // beforeSubmit is called with the same argument as the output of the wait action
+        expect(beforeSubmit.args[0][0]).to.deep.equal(actions.wait(request));
+
+        done();
+      });
     });
   });
 });
