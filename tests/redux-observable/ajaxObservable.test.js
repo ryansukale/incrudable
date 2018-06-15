@@ -2,14 +2,6 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import mock from 'xhr-mock';
-import {JSDOM} from 'jsdom';
-import {Blob} from 'blob-polyfill';
-import FormData from 'form-data';
-
-global.window = (new JSDOM()).window;
-global.Document = window.Document;
-global.Blob = Blob;
-global.FormData = FormData;
 
 import ajaxObservable from '../../src/redux-observable/ajaxObservable';
 const path = '/albums';

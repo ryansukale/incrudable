@@ -227,7 +227,7 @@ describe('generateEpic', () => {
     });
   });
 
-  describe.only('epicGenerator', () => {
+  describe('epicGenerator', () => {
     function prepareData({onSuccess, onFailure, ajax}) {
       const actions = createActionGroup('LIST_ALBUMS');
       const url = '/albums';
