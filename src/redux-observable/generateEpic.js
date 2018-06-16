@@ -1,5 +1,7 @@
 import { Observable, from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
+import createUrl from 'batarang/createUrl';
+
 import defaultAjax from './ajaxObservable';
 
 function identity(action) {
@@ -20,7 +22,11 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
   }
 
   function submit({payload: request}) {
-    return from(ajax[ajaxMethodName](request))
+    const path = createUrl(url, {
+      params: request.params,
+      query: request.query
+    });
+    return from(ajax[ajaxMethodName](path, request))
       .pipe(
         map(
           (response) => onSuccess({actions, payload: {request, response}})

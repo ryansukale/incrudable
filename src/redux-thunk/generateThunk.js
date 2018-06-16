@@ -8,10 +8,6 @@ function identity(data) {
 }
 
 export function getThunkCreator(ajaxMethodName, config, { ajax }) {
-  function submit(path, request) {
-    return ajax[ajaxMethodName](path, request);
-  }
-
   return function(request, done) {
     return dispatch => {
       const {
@@ -28,15 +24,17 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
 
       const handlerConfig = { actions, dispatch, onFailure, done };
       
+      function submit({payload: request}) {
+        const path = createUrl(url, {
+          params: request.params,
+          query: request.query
+        });
+        return ajax[ajaxMethodName](path, request);
+      }
+
       return Promise.resolve(1)
         .then(() => beforeSubmit(actionObject))
-        .then(({payload: request}) => {
-          const fullUrl = createUrl(url, {
-            params: request.params,
-            query: request.query
-          });
-          return submit(fullUrl, request);
-        })
+        .then(submit)
         .then(response => {
           return onSuccess(handlerConfig, request, response);
         })

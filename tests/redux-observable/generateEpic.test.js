@@ -304,7 +304,10 @@ describe('generateEpic', () => {
     it('invokes the custom beforeSubmit function', (done) => {
       const suffix = 'modified_or_delayed';
       const beforeSubmit = sinon.spy(function (request) {
-        return of({body: `${request.body}_${suffix}`});
+        return of({
+          type: 'SAMPLE',
+          payload: {body: `${request.body}_${suffix}`}
+        });
       });
 
       const {operation, request, actions} = prepareData({
