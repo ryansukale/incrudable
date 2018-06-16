@@ -3,12 +3,15 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import generateThunk from '../../src/redux-thunk/generateThunk';
+import createActionGroup from '../../src/createActionGroup';
 
-function createMockActions() {
-  return ['wait', 'success', 'failure'].reduce((acc, type) => {
-    acc[type] = sinon.stub().returns(type); // () => {console.log(type); sinon.stub().returns(type)();}
-    return acc;
-  }, {});
+function createActions(base) {
+  const actions = createActionGroup(base);
+  sinon.spy(actions, 'wait');
+  sinon.spy(actions, 'success');
+  sinon.spy(actions, 'failure');
+
+  return actions;
 }
 
 function createMockAjax() {
@@ -24,8 +27,8 @@ describe('generateThunk', () => {
   it('generates thunk for `create` operation that dispatches all the actions', () => {
     const options = {
       operation: 'create',
-      actions: createMockActions(),
-      url: '/users'
+      actions: createActions('CREATE_ALBUMS'),
+      url: '/albums'
     };
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
@@ -37,15 +40,15 @@ describe('generateThunk', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.postJSON.calledOnce);
-      expect(config.ajax.postJSON.firstCall.args[0]).to.equal('/users');
+      expect(config.ajax.postJSON.firstCall.args[0]).to.equal('/albums');
     });
   });
 
   it('generates thunk for `read` operation that dispatches all the actions', () => {
     const options = {
       operation: 'read',
-      actions: createMockActions(),
-      url: '/users/:id'
+      actions: createActions('READ_ALBUMS'),
+      url: '/albums/:id'
     };
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
@@ -57,15 +60,15 @@ describe('generateThunk', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users/10');
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums/10');
     });
   });
 
   it('generates thunk for `update` operation that dispatches all the actions', () => {
     const options = {
       operation: 'update',
-      actions: createMockActions(),
-      url: '/users/:id'
+      actions: createActions('UPDATE_ALBUMS'),
+      url: '/albums/:id'
     };
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
@@ -77,15 +80,15 @@ describe('generateThunk', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.putJSON.calledOnce);
-      expect(config.ajax.putJSON.firstCall.args[0]).to.equal('/users/10');
+      expect(config.ajax.putJSON.firstCall.args[0]).to.equal('/albums/10');
     });
   });
 
   it('generates thunk for `delete` operation that dispatches all the actions', () => {
     const options = {
       operation: 'del',
-      actions: createMockActions(),
-      url: '/users/:id'
+      actions: createActions('DEL_ALBUMS'),
+      url: '/albums/:id'
     };
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
@@ -97,15 +100,15 @@ describe('generateThunk', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.delJSON.calledOnce);
-      expect(config.ajax.delJSON.firstCall.args[0]).to.equal('/users/10');
+      expect(config.ajax.delJSON.firstCall.args[0]).to.equal('/albums/10');
     });
   });
 
   it('generates thunk for `list` operation that dispatches all the actions', () => {
     const options = {
       operation: 'list',
-      actions: createMockActions(),
-      url: '/users'
+      actions: createActions('LIST_ALBUMS'),
+      url: '/albums'
     };
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
@@ -117,15 +120,15 @@ describe('generateThunk', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/users?sort=age');
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums?sort=age');
     });
   });
 
   it('invokes custom onSuccess', () => {
     const options = {
       operation: 'read',
-      actions: createMockActions(),
-      url: '/users/:id',
+      actions: createActions('READ_ALBUMS'),
+      url: '/albums/:id',
       onSuccess: sinon.spy()
     };
     const request = { params: { id: '10' } };
@@ -152,8 +155,8 @@ describe('generateThunk', () => {
   it('invokes custom onFailure', () => {
     const options = {
       operation: 'read',
-      actions: createMockActions(),
-      url: '/users/:id',
+      actions: createActions('READ_ALBUMS'),
+      url: '/albums/:id',
       onFailure: sinon.spy()
     };
     const request = { params: { id: '10' } };

@@ -3,27 +3,43 @@ import createUrl from 'batarang/createUrl';
 import { onJsonApiResponse, onJsonApiError } from './handlers';
 import defaultAjax from './ajaxPromise';
 
+function identity(data) {
+  return Promise.resolve(data);
+}
+
 function getThunkCreator(ajaxMethodName, config, { ajax }) {
+  function submit(path, request) {
+    return ajax[ajaxMethodName](path, request);
+  }
+
   return function(request, done) {
     return dispatch => {
       const {
         url,
         actions,
+        beforeSubmit = identity,
         onSuccess = onJsonApiResponse,
         onFailure = onJsonApiError
       } = config;
 
-      if (actions.wait) {
-        dispatch(actions.wait(request));
-      }
+      const actionObject = actions.wait(request);
+
+      dispatch(actionObject);
 
       const handlerConfig = { actions, dispatch, onFailure, done };
-      const fullUrl = createUrl(url, {
-        params: request.params,
-        query: request.query
-      });
-
-      return ajax[ajaxMethodName](fullUrl, request)
+      // const fullUrl = createUrl(url, {
+      //   params: request.params,
+      //   query: request.query
+      // });
+      
+      return beforeSubmit(actionObject)
+        .then(arg => {
+          const fullUrl = createUrl(url, {
+            params: request.params,
+            query: request.query
+          });
+          return submit(fullUrl, request);
+        })
         .then(response => {
           return onSuccess(handlerConfig, request, response);
         })

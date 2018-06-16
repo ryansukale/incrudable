@@ -1,7 +1,7 @@
 import { Observable, from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
+import defaultAjax from './ajaxObservable';
 
-const defaultAjax = {};
 function identity(data) {
   return of(data);
 }
