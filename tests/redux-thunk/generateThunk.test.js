@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 
-import generateThunk from '../../src/redux-thunk/generateThunk';
+import generateThunk, { getThunkCreator } from '../../src/redux-thunk/generateThunk';
 import createActionGroup from '../../src/createActionGroup';
 
 function createActions(base) {
@@ -181,6 +181,80 @@ describe('generateThunk', () => {
       );
       expect(args[1]).to.equal(request);
       expect(args[2]).to.equal('getJSON');
+    });
+  });
+});
+
+describe('getThunkCreator', () => {
+  it('executes a custom beforeSubmit that retuns an action', () => {
+    function beforeSubmit(action) {
+      return {
+        ...action,
+        payload: {
+          ...action.payload,
+          params: {
+            id: `prefix_${action.payload.params.id}`
+          }
+        }
+      };
+    }
+
+    const options = {
+      operation: 'read',
+      actions: createActions('READ_ALBUMS'),
+      url: '/albums/:id',
+      beforeSubmit
+    };
+    sinon.spy(options, 'beforeSubmit');
+
+    const config = { ajax: createMockAjax() };
+    const dispatch = sinon.spy();
+    const thunk = getThunkCreator('getJSON', options, config)({ params: { id: '10' } });
+
+    return thunk(dispatch).then(() => {
+      expect(options.actions.wait.calledOnce).to.equal(true);
+      expect(options.beforeSubmit.calledOnce).to.equal(true);
+      expect(options.actions.success.calledOnce).to.equal(true);
+      expect(dispatch.calledTwice).to.equal(true);
+
+      expect(config.ajax.getJSON.calledOnce);
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums/prefix_10');
+    });
+  });
+
+  it('executes a custom beforeSubmit that retuns a Promise', () => {
+    function beforeSubmit(action) {
+      return Promise.resolve({
+        ...action,
+        payload: {
+          ...action.payload,
+          params: {
+            id: `prefix_${action.payload.params.id}`
+          }
+        }
+      });
+    }
+
+    const options = {
+      operation: 'read',
+      actions: createActions('READ_ALBUMS'),
+      url: '/albums/:id',
+      beforeSubmit
+    };
+    sinon.spy(options, 'beforeSubmit');
+
+    const config = { ajax: createMockAjax() };
+    const dispatch = sinon.spy();
+    const thunk = getThunkCreator('getJSON', options, config)({ params: { id: '10' } });
+
+    return thunk(dispatch).then(() => {
+      expect(options.actions.wait.calledOnce).to.equal(true);
+      expect(options.beforeSubmit.calledOnce).to.equal(true);
+      expect(options.actions.success.calledOnce).to.equal(true);
+      expect(dispatch.calledTwice).to.equal(true);
+
+      expect(config.ajax.getJSON.calledOnce);
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums/prefix_10');
     });
   });
 });

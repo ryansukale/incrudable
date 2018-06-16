@@ -2,8 +2,8 @@ import { Observable, from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
 import defaultAjax from './ajaxObservable';
 
-function identity(data) {
-  return of(data);
+function identity(action) {
+  return of(action);
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {

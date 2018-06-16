@@ -7,7 +7,7 @@ function identity(data) {
   return Promise.resolve(data);
 }
 
-function getThunkCreator(ajaxMethodName, config, { ajax }) {
+export function getThunkCreator(ajaxMethodName, config, { ajax }) {
   function submit(path, request) {
     return ajax[ajaxMethodName](path, request);
   }
@@ -27,13 +27,10 @@ function getThunkCreator(ajaxMethodName, config, { ajax }) {
       dispatch(actionObject);
 
       const handlerConfig = { actions, dispatch, onFailure, done };
-      // const fullUrl = createUrl(url, {
-      //   params: request.params,
-      //   query: request.query
-      // });
       
-      return beforeSubmit(actionObject)
-        .then(arg => {
+      return Promise.resolve(1)
+        .then(() => beforeSubmit(actionObject))
+        .then(({payload: request}) => {
           const fullUrl = createUrl(url, {
             params: request.params,
             query: request.query
@@ -65,7 +62,7 @@ const thunkGenerators = {
 };
 
 export default function generateThunk(
-  { operation, actions, onSuccess, onFailure, url },
+  { operation, actions, onSuccess, onFailure, beforeSubmit, url },
   config = {}
 ) {
   const operationName = operation.toLowerCase();
@@ -80,5 +77,5 @@ export default function generateThunk(
 
   config.ajax = config.ajax || defaultAjax;
 
-  return generator({ url, actions, onSuccess, onFailure }, config);
+  return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, config);
 }
