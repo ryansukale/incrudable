@@ -306,13 +306,11 @@ describe('generateEpic', () => {
 
     it('invokes the custom beforeSubmit function', (done) => {
       const prefix = 'prefix';
-      const beforeSubmit = sinon.spy(function (action) {
-        const {payload: request} = action;
+      const beforeSubmit = sinon.spy(function (request) {
+        // Return a custom payload
         return of({
-          type: 'SAMPLE',
-          payload: {params: {
-            id: `${prefix}_${request.params.id}`}
-          }
+          params: {
+          id: `${prefix}_${request.params.id}`}
         });
       });
       const getJSON = sinon.spy(() => Promise.resolve({}));
@@ -331,7 +329,7 @@ describe('generateEpic', () => {
         // Custom beforeSubmit is called
         expect(beforeSubmit.calledOnce).to.equal(true);
         // beforeSubmit is called with the same argument as the output of the wait action
-        expect(beforeSubmit.args[0][0]).to.deep.equal(actions.wait(request));
+        expect(beforeSubmit.args[0][0]).to.deep.equal(request);
 
         // Ensure that the payload of the preprocessor is used as the request
         expect(getJSON.args[0][1]).to.deep.equal({

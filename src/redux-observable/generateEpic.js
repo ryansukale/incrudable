@@ -4,8 +4,8 @@ import createUrl from 'batarang/createUrl';
 
 import defaultAjax from './ajaxObservable';
 
-function identity(action) {
-  return of(action);
+function identity(request) {
+  return of(request);
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
@@ -21,7 +21,7 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
     return actions.wait(request);
   }
 
-  function submit({payload: request}) {
+  function submit(request) {
     const path = createUrl(url, {
       params: request.params,
       query: request.query
@@ -51,7 +51,7 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
     return action$
       .pipe(
         filter(actions.wait),
-        switchMap(beforeSubmit),
+        switchMap(({payload}) => beforeSubmit(payload)),
         switchMap(submit)
       );
   }
