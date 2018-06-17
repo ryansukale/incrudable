@@ -228,10 +228,9 @@ describe('generateEpic', () => {
   });
 
   describe('epicGenerator', () => {
-    function prepareData({onSuccess, onFailure, beforeSubmit, ajax}) {
+    function prepareData({onSuccess, onFailure, beforeSubmit, request, ajax}) {
       const actions = createActionGroup('LIST_ALBUMS');
       const url = '/albums';
-      const request = { body: 'hello' };
       const response = { body: [] };
       const config = {
         ajax: ajax || { getJSON: () => Promise.resolve(response) }
@@ -249,7 +248,11 @@ describe('generateEpic', () => {
       sinon.spy(actions, 'success');
       sinon.spy(actions, 'failure');
 
-      return {operation, request, actions};
+      return {
+        operation,
+        request: request || { body: 'hello' },
+        actions
+      };
     }
 
     it('invokes the custom onSuccess function', (done) => {
@@ -302,17 +305,22 @@ describe('generateEpic', () => {
     });
 
     it('invokes the custom beforeSubmit function', (done) => {
-      const suffix = 'modified_or_delayed';
-      const beforeSubmit = sinon.spy(function (request) {
+      const prefix = 'prefix';
+      const beforeSubmit = sinon.spy(function (action) {
+        const {payload: request} = action;
         return of({
           type: 'SAMPLE',
-          payload: {body: `${request.body}_${suffix}`}
+          payload: {params: {
+            id: `${prefix}_${request.params.id}`}
+          }
         });
       });
+      const getJSON = sinon.spy(() => Promise.resolve({}));
 
       const {operation, request, actions} = prepareData({
         beforeSubmit,
-        ajax: { getJSON: () => Promise.resolve({}) }
+        request: {params: {id: 10}},
+        ajax: { getJSON }
       });
       const {epic} = operation;
 
@@ -324,6 +332,11 @@ describe('generateEpic', () => {
         expect(beforeSubmit.calledOnce).to.equal(true);
         // beforeSubmit is called with the same argument as the output of the wait action
         expect(beforeSubmit.args[0][0]).to.deep.equal(actions.wait(request));
+
+        // Ensure that the payload of the preprocessor is used as the request
+        expect(getJSON.args[0][1]).to.deep.equal({
+          params: { id: 'prefix_10' }
+        });
 
         done();
       });
