@@ -24,7 +24,7 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
 
       const handlerConfig = { actions, dispatch, onFailure, done };
       
-      function submit({payload: request}) {
+      function submit(request) {
         const path = createUrl(url, {
           params: request.params,
           query: request.query
@@ -33,7 +33,7 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
       }
 
       return Promise.resolve(1)
-        .then(() => beforeSubmit(actionObject))
+        .then(() => beforeSubmit(actionObject.payload))
         .then(submit)
         .then(response => {
           return onSuccess(handlerConfig, request, response);

@@ -187,14 +187,11 @@ describe('generateThunk', () => {
 
 describe('getThunkCreator', () => {
   it('executes a custom beforeSubmit that retuns an action', () => {
-    function beforeSubmit(action) {
+    function beforeSubmit(request) {
       return {
-        ...action,
-        payload: {
-          ...action.payload,
-          params: {
-            id: `prefix_${action.payload.params.id}`
-          }
+        ...request,
+        params: {
+          id: `prefix_${request.params.id}`
         }
       };
     }
@@ -222,15 +219,12 @@ describe('getThunkCreator', () => {
     });
   });
 
-  it('executes a custom beforeSubmit that retuns a Promise', () => {
-    function beforeSubmit(action) {
+  it('executes a custom beforeSubmit that returns a Promise', () => {
+    function beforeSubmit(request) {
       return Promise.resolve({
-        ...action,
-        payload: {
-          ...action.payload,
-          params: {
-            id: `prefix_${action.payload.params.id}`
-          }
+        ...request,
+        params: {
+          id: `prefix_${request.params.id}`
         }
       });
     }
