@@ -29,27 +29,61 @@ export function ajax(url, options) {
   }).then(onResponse);
 }
 
-export default {
-  getJSON(url) {
-    return ajax(url);
-  },
-  postJSON(url, { body, ...options }) {
-    return ajax(url, {
-      method: 'POST',
-      body: JSON.stringify(options.body),
-      ...options
-    });
-  },
-  putJSON(url, { body, ...options }) {
-    return ajax(url, {
-      method: 'PUT',
-      body: JSON.stringify(body),
-      ...options
-    });
-  },
-  delJSON(url) {
-    return ajax(url, {
-      method: 'DELETE'
-    });
+const identity = data => data;
+
+export default function ajaxPromise(getHeaders = identity) {
+  return {
+    getJSON(url) {
+      return ajax(url, {
+        headers: getHeaders()
+      });
+    },
+    postJSON(url, { body, ...options }) {
+      return ajax(url, {
+        method: 'POST',
+        body: JSON.stringify(options.body),
+        headers: getHeaders()
+        ...options
+      });
+    },
+    putJSON(url, { body, ...options }) {
+      return ajax(url, {
+        method: 'PUT',
+        body: JSON.stringify(body),
+        headers: getHeaders()
+        ...options
+      });
+    },
+    delJSON(url) {
+      return ajax(url, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+    }
   }
-};
+}
+
+// export default {
+//   getJSON(url) {
+//     return ajax(url);
+//   },
+//   postJSON(url, { body, ...options }) {
+//     return ajax(url, {
+//       method: 'POST',
+//       body: JSON.stringify(options.body),
+//       ...options
+//     });
+//   },
+//   putJSON(url, { body, ...options }) {
+//     return ajax(url, {
+//       method: 'PUT',
+//       body: JSON.stringify(body),
+//       ...options
+//     });
+//   },
+//   delJSON(url) {
+//     return ajax(url, {
+//       method: 'DELETE'
+//     });
+//   }
+// };

@@ -9,7 +9,6 @@ export function onJsonApiResponse(
     return undefined;
   }
 
-  // console.log(actions.success);
   const payload = { request, response };
   dispatch(actions.success(payload));
   if (done) {
