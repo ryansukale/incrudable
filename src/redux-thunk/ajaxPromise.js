@@ -5,6 +5,9 @@ const DEAULT_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8'
 };
 
+const identity = data => data;
+let getHeaders;
+
 function onResponse(response) {
   if (response.ok) {
     return response.json();
@@ -24,25 +27,22 @@ export function ajax(url, options) {
     ...options,
     headers: {
       ...DEAULT_HEADERS,
+      ...getHeaders(),
       ...options.headers
     }
   }).then(onResponse);
 }
 
-const identity = data => data;
-
-export default function ajaxPromise(getHeaders = identity) {
+export default function ajaxPromise(customGetHeaders = identity) {
+  getHeaders = customGetHeaders;
   return {
-    getJSON(url) {
-      return ajax(url, {
-        headers: getHeaders()
-      });
+    getJSON(url, options) {
+      return ajax(url, options);
     },
     postJSON(url, { body, ...options }) {
       return ajax(url, {
         method: 'POST',
-        body: JSON.stringify(options.body),
-        headers: getHeaders()
+        body: JSON.stringify(body),
         ...options
       });
     },
@@ -50,40 +50,14 @@ export default function ajaxPromise(getHeaders = identity) {
       return ajax(url, {
         method: 'PUT',
         body: JSON.stringify(body),
-        headers: getHeaders()
         ...options
       });
     },
-    delJSON(url) {
+    delJSON(url, options) {
       return ajax(url, {
         method: 'DELETE',
-        headers: getHeaders()
+        ...options
       });
     }
   }
 }
-
-// export default {
-//   getJSON(url) {
-//     return ajax(url);
-//   },
-//   postJSON(url, { body, ...options }) {
-//     return ajax(url, {
-//       method: 'POST',
-//       body: JSON.stringify(options.body),
-//       ...options
-//     });
-//   },
-//   putJSON(url, { body, ...options }) {
-//     return ajax(url, {
-//       method: 'PUT',
-//       body: JSON.stringify(body),
-//       ...options
-//     });
-//   },
-//   delJSON(url) {
-//     return ajax(url, {
-//       method: 'DELETE'
-//     });
-//   }
-// };

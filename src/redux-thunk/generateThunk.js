@@ -1,7 +1,7 @@
 import createUrl from 'batarang/createUrl';
 
 import { onJsonApiResponse, onJsonApiError } from './handlers';
-import defaultAjax from './ajaxPromise';
+import ajaxPromise from './ajaxPromise';
 
 function identity(data) {
   return Promise.resolve(data);
@@ -73,7 +73,7 @@ export default function generateThunk(
     );
   }
 
-  config.ajax = config.ajax || defaultAjax;
+  config.ajax = config.ajax || ajaxPromise(config.getHeaders);
 
   return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, config);
 }
