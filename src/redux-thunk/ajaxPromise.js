@@ -1,6 +1,6 @@
-import fetch from 'whatwg-fetch';
+import 'whatwg-fetch';
 
-const DEAULT_HEADERS = {
+export const DEAULT_HEADERS = {
   'Accept': 'application/json',
   'Content-Type': 'application/json; charset=utf-8'
 };
@@ -10,7 +10,9 @@ let getHeaders;
 
 function onResponse(response) {
   if (response.ok) {
-    return response.json();
+    return response.json().then(json => {
+      return json;
+    });
   }
 
   if (response.headers.get('Content-Type').indexOf('json') !== -1) {
@@ -22,7 +24,7 @@ function onResponse(response) {
   return Promise.reject(response);
 }
 
-export function ajax(url, options) {
+export function ajax(url, options = {}) {
   return fetch(url, {
     ...options,
     headers: {
