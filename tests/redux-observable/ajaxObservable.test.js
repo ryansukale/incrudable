@@ -22,7 +22,7 @@ describe('ajaxObservable', () => {
       body: JSON.stringify(responseBody)
     });
 
-    ajaxObservable
+    ajaxObservable()
       .getJSON(path)
       .subscribe(data => {
         expect(data).to.deep.equal(responseBody);
@@ -38,7 +38,7 @@ describe('ajaxObservable', () => {
       body: JSON.stringify(responseBody)
     });
 
-    ajaxObservable
+    ajaxObservable()
       .postJSON(path, request)
       .subscribe(data => {
         expect(data).to.deep.equal(responseBody);
@@ -54,7 +54,7 @@ describe('ajaxObservable', () => {
       body: JSON.stringify(responseBody)
     });
 
-    ajaxObservable
+    ajaxObservable()
       .putJSON(path, request)
       .subscribe(data => {
         expect(data).to.deep.equal(responseBody);
@@ -67,7 +67,7 @@ describe('ajaxObservable', () => {
       status: 200
     });
 
-    ajaxObservable
+    ajaxObservable()
       .delJSON(path)
       .subscribe(data => {
         expect(data).to.deep.equal('');

@@ -2,7 +2,7 @@ import { Observable, from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
 import createUrl from 'batarang/createUrl';
 
-import defaultAjax from './ajaxObservable';
+import ajaxObservable from './ajaxObservable';
 
 function identity(request) {
   return of(request);
@@ -88,7 +88,7 @@ export default function generateEpic(
     );
   }
 
-  config.ajax = config.ajax || defaultAjax;
+  config.ajax = config.ajax || ajaxObservable(config.getHeaders);
 
   return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, config);
 }
