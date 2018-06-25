@@ -43,6 +43,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "batarang": "^2.0.12",
+    "chai-subset": "^1.6.0",
     "redux-actions": "^2.3.0",
     "redux-observable": "^0.18.0",
     "rx-lite-dom-ajax": "^7.0.3",

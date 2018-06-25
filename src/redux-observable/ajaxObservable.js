@@ -1,8 +1,8 @@
 import * as Rx from 'rx-lite-dom-ajax';
 
 export const DEAULT_HEADERS = {
-  'Accept': 'application/json',
-  'Content-Type': 'application/json; charset=utf-8'
+  'accept': 'application/json',
+  'content-type': 'application/json; charset=utf-8'
 };
 
 const identity = data => data;
