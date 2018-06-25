@@ -15,7 +15,7 @@ describe('ajaxPromise', () => {
   });
   const createFetchSpy = () => sinon.spy(() => mockFetchResponse);
   const customHeaders = {
-    'X-CUSTOM-HEADER': 'value'
+    'x-custom-header': 'value'
   };
 
   function getHeaders() {
