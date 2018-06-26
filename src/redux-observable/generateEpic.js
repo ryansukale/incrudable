@@ -26,24 +26,32 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
       params: request.params,
       query: request.query
     });
+
+    const handlerConfig = {actions, onFailure};
+
     return from(ajax[ajaxMethodName](path, request))
       .pipe(
         map(
-          (response) => onSuccess({actions, payload: {request, response}})
+          (response) => onSuccess(handlerConfig, request, response)
         ),
         catchError(
           (response) => of(
-            onFailure({actions, payload: {request, response}})
+            onFailure(handlerConfig, request, response)
           )
         )
       );
   }
 
-  function onJsonApiResponse({actions, payload}) {
+  function onJsonApiResponse({actions, onFailure}, request, response) {
+    if (response.errors) {
+      return onFailure({actions}, request, response);
+    }
+    const payload = {request, response};
     return actions.success(payload);
   }
 
-  function onJsonApiError({actions, payload}) {
+  function onJsonApiError({actions}, request, response) {
+    const payload = {request, errors: response.errors};
     return actions.failure(payload);
   }
 

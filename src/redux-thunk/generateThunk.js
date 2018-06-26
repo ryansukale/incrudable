@@ -38,8 +38,8 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
         .then(response => {
           return onSuccess(handlerConfig, request, response);
         })
-        .catch(errors => {
-          return onFailure(handlerConfig, request, errors);
+        .catch(response => {
+          return onFailure(handlerConfig, request, response);
         });
     };
   };

@@ -37,7 +37,7 @@ function assertCustomHeader(methodName, options) {
   return ajaxObservable(getHeaders)[methodName](path, options);
 }
 
-describe.only('ajaxObservable', () => {
+describe('ajaxObservable', () => {
   beforeEach(() => {
     mock.setup();
   });
