@@ -45,7 +45,7 @@ describe('generateEpic', () => {
         url: '/albums'
       };
       const request = { body: 'hello' };
-      const response = { body: 'Test error'};
+      const response = { errors: ['Test error'] };
       const ajax = { postJSON: () => Promise.reject(response) };
       const operation = getTask(options, ajax);
       const {epic} = operation;
@@ -53,7 +53,8 @@ describe('generateEpic', () => {
 
       epic(action$).subscribe(() => {
         expect(options.actions.wait.args[0][0]).to.deep.equal(request);
-        expect(options.actions.failure.args[0][0]).to.deep.equal({request, response});
+        console.log(options.actions.failure.args[0][0]);
+        expect(options.actions.failure.args[0][0]).to.deep.equal({request, errors: response.errors});
         done();
       });
     });
@@ -87,7 +88,7 @@ describe('generateEpic', () => {
         url: '/albums'
       };
       const request = { body: 'hello' };
-      const response = { body: 'Test error'};
+      const response = { errors: ['Test error'] };
       const ajax = { getJSON: () => Promise.reject(response) };
       const operation = getTask(options, ajax);
       const {epic} = operation;
@@ -95,7 +96,7 @@ describe('generateEpic', () => {
 
       epic(action$).subscribe(() => {
         expect(options.actions.wait.args[0][0]).to.deep.equal(request);
-        expect(options.actions.failure.args[0][0]).to.deep.equal({request, response});
+        expect(options.actions.failure.args[0][0]).to.deep.equal({request, errors: response.errors});
         done();
       });
     })
@@ -109,7 +110,7 @@ describe('generateEpic', () => {
         url: '/albums'
       };
       const request = { body: 'hello' };
-      const response = { body: 'test'};
+      const response = { body: 'test' };
       const ajax = { putJSON: () => Promise.resolve(response) };
       const operation = getTask(options, ajax);
       const {epic} = operation;
@@ -137,7 +138,7 @@ describe('generateEpic', () => {
 
       epic(action$).subscribe(() => {
         expect(options.actions.wait.args[0][0]).to.deep.equal(request);
-        expect(options.actions.failure.args[0][0]).to.deep.equal({request, response});
+        expect(options.actions.failure.args[0][0]).to.deep.equal({request, errors: response.errors});
         done();
       });
     })
@@ -171,7 +172,7 @@ describe('generateEpic', () => {
         url: '/albums'
       };
       const request = { body: 'hello' };
-      const response = { body: 'Test error'};
+      const response = { errors: ['Test error'] };
       const ajax = { delJSON: () => Promise.reject(response) };
       const operation = getTask(options, ajax);
       const {epic} = operation;
@@ -179,7 +180,7 @@ describe('generateEpic', () => {
 
       epic(action$).subscribe(() => {
         expect(options.actions.wait.args[0][0]).to.deep.equal(request);
-        expect(options.actions.failure.args[0][0]).to.deep.equal({request, response});
+        expect(options.actions.failure.args[0][0]).to.deep.equal({request, errors: response.errors});
         done();
       });
     })
@@ -213,7 +214,7 @@ describe('generateEpic', () => {
         url: '/albums'
       };
       const request = { body: 'hello' };
-      const response = { body: 'Test error'};
+      const response = { errors: ['Test error'] };
       const ajax = { getJSON: () => Promise.reject(response) };
       const operation = getTask(options, ajax);
       const {epic} = operation;
@@ -221,7 +222,7 @@ describe('generateEpic', () => {
 
       epic(action$).subscribe(() => {
         expect(options.actions.wait.args[0][0]).to.deep.equal(request);
-        expect(options.actions.failure.args[0][0]).to.deep.equal({request, response});
+        expect(options.actions.failure.args[0][0]).to.deep.equal({request, errors: response.errors});
         done();
       });
     });
