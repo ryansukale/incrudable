@@ -11,9 +11,7 @@ let getHeaders;
 
 function onResponse(response) {
   if (response.ok) {
-    return response.json().then(json => {
-      return json;
-    });
+    return response.json().then(json => json);
   }
 
   if (response.headers.get('Content-Type').indexOf('json') !== -1) {
