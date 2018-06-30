@@ -16,6 +16,7 @@ build
 .grunt
 .idea
 .yarnclean
+.prettierignore
 
 env
 node_modules
