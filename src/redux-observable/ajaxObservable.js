@@ -1,7 +1,7 @@
 import * as Rx from 'rx-lite-dom-ajax';
 
 export const DEAULT_HEADERS = {
-  'accept': 'application/json',
+  accept: 'application/json',
   'content-type': 'application/json; charset=utf-8'
 };
 
@@ -17,7 +17,7 @@ function getJsonAjaxStream(settings) {
       ...getHeaders(),
       ...settings.headers
     }
-  }).map(({response}) => response);
+  }).map(({ response }) => response);
 }
 
 export default function ajaxObservable(customGetHeaders = identity) {
@@ -36,7 +36,7 @@ export default function ajaxObservable(customGetHeaders = identity) {
         url,
         method: 'POST',
         body,
-        ...options,
+        ...options
       });
     },
     putJSON(url, { body, ...options }) {
@@ -44,7 +44,7 @@ export default function ajaxObservable(customGetHeaders = identity) {
         url,
         method: 'PUT',
         body,
-        ...options,
+        ...options
       });
     },
     delJSON(url, options) {
@@ -55,5 +55,5 @@ export default function ajaxObservable(customGetHeaders = identity) {
         ...options
       });
     }
-  }
+  };
 }

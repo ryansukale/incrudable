@@ -1,12 +1,13 @@
-/* global describe, it */
+/* global describe, it, beforeEach, afterEach */
 import chai, { expect } from 'chai';
 import chaiSubset from 'chai-subset';
-import sinon from 'sinon';
 import mock from 'xhr-mock';
 
-chai.use(chaiSubset);
+import ajaxObservable, {
+  DEAULT_HEADERS
+} from '../../src/redux-observable/ajaxObservable';
 
-import ajaxObservable, { DEAULT_HEADERS } from '../../src/redux-observable/ajaxObservable';
+chai.use(chaiSubset);
 const path = '/albums';
 
 const customHeaders = {
@@ -22,7 +23,7 @@ const mockMap = {
   postJSON: 'post',
   putJSON: 'put',
   delJSON: 'delete'
-}
+};
 
 function assertCustomHeader(methodName, options) {
   const httpMethod = mockMap[methodName];
@@ -47,8 +48,8 @@ describe('ajaxObservable', () => {
   });
 
   describe('getJSON', () => {
-    it('returns an observable of a GET request', (done) => {
-      const responseBody = {hello: 'world'};
+    it('returns an observable of a GET request', done => {
+      const responseBody = { hello: 'world' };
       mock.get(path, (req, res) => {
         expect(req.headers()).to.containSubset(DEAULT_HEADERS);
         return res.status(200).body(JSON.stringify(responseBody));
@@ -62,16 +63,15 @@ describe('ajaxObservable', () => {
         });
     });
 
-    it('uses custom headers in the GET request', (done) => {
-      return assertCustomHeader('getJSON')
-        .subscribe(() => done());
+    it('uses custom headers in the GET request', done => {
+      return assertCustomHeader('getJSON').subscribe(() => done());
     });
   });
 
   describe('postJSON', () => {
-    const request = {body: 'message'};
-    it('returns an observable of a POST request', (done) => {
-      const responseBody = {hello: 'world'};
+    const request = { body: 'message' };
+    it('returns an observable of a POST request', done => {
+      const responseBody = { hello: 'world' };
       mock.post(path, (req, res) => {
         expect(req.headers()).to.containSubset(DEAULT_HEADERS);
         return res.status(201).body(JSON.stringify(responseBody));
@@ -85,17 +85,16 @@ describe('ajaxObservable', () => {
         });
     });
 
-    it('uses custom headers in the POST request', (done) => {
-      return assertCustomHeader('postJSON', request)
-        .subscribe(() => done());
+    it('uses custom headers in the POST request', done => {
+      return assertCustomHeader('postJSON', request).subscribe(() => done());
     });
   });
 
   describe('putJSON', () => {
-    const request = {body: 'message'};
+    const request = { body: 'message' };
 
-    it('returns an observable of a PUT request', (done) => {
-      const responseBody = {hello: 'world'};
+    it('returns an observable of a PUT request', done => {
+      const responseBody = { hello: 'world' };
       mock.put(path, (req, res) => {
         expect(req.headers()).to.containSubset(DEAULT_HEADERS);
         return res.status(200).body(JSON.stringify(responseBody));
@@ -109,14 +108,13 @@ describe('ajaxObservable', () => {
         });
     });
 
-    it('uses custom headers in the PUT request', (done) => {
-      return assertCustomHeader('putJSON', request)
-        .subscribe(() => done());
+    it('uses custom headers in the PUT request', done => {
+      return assertCustomHeader('putJSON', request).subscribe(() => done());
     });
   });
 
   describe('delJSON', () => {
-    it('returns an observable of a DELETE request', (done) => {
+    it('returns an observable of a DELETE request', done => {
       mock.delete(path, (req, res) => {
         expect(req.headers()).to.containSubset(DEAULT_HEADERS);
         return res.status(200).body('');
@@ -130,9 +128,8 @@ describe('ajaxObservable', () => {
         });
     });
 
-    it('uses custom headers in the DELETE request', (done) => {
-      return assertCustomHeader('delJSON')
-        .subscribe(() => done());
+    it('uses custom headers in the DELETE request', done => {
+      return assertCustomHeader('delJSON').subscribe(() => done());
     });
   });
 });

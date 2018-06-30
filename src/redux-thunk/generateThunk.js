@@ -23,7 +23,7 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
       dispatch(actionObject);
 
       const handlerConfig = { actions, dispatch, onFailure, done };
-      
+
       function submit(request) {
         const path = createUrl(url, {
           params: request.params,
@@ -75,5 +75,8 @@ export default function generateThunk(
 
   config.ajax = config.ajax || ajaxPromise(config.getHeaders);
 
-  return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, config);
+  return generator(
+    { url, actions, onSuccess, onFailure, beforeSubmit },
+    config
+  );
 }

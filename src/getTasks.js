@@ -1,4 +1,9 @@
-export default function getTasks(taskGenerator, resource, actionGroups, config) {
+export default function getTasks(
+  taskGenerator,
+  resource,
+  actionGroups,
+  config
+) {
   return Object.keys(actionGroups).reduce((acc, operation) => {
     const url = resource.operations[operation];
     const actions = actionGroups[operation];

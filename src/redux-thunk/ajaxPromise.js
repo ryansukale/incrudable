@@ -1,7 +1,8 @@
-import 'whatwg-fetch';
+/* global fetch */
+import 'whatwg-fetch'; /* eslint-disable-line import/no-unassigned-import */
 
 export const DEAULT_HEADERS = {
-  'Accept': 'application/json',
+  Accept: 'application/json',
   'Content-Type': 'application/json; charset=utf-8'
 };
 
@@ -16,9 +17,7 @@ function onResponse(response) {
   }
 
   if (response.headers.get('Content-Type').indexOf('json') !== -1) {
-    return response
-      .json()
-      .then((error) => Promise.reject(error));
+    return response.json().then(error => Promise.reject(error));
   }
 
   return Promise.reject(response);
@@ -61,5 +60,5 @@ export default function ajaxPromise(customGetHeaders = identity) {
         ...options
       });
     }
-  }
+  };
 }

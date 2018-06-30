@@ -1,4 +1,4 @@
-import { Observable, from, of } from 'rxjs';
+import { from, of } from 'rxjs';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
 import createUrl from 'batarang/createUrl';
 
@@ -27,43 +27,35 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
       query: request.query
     });
 
-    const handlerConfig = {actions, onFailure};
+    const handlerConfig = { actions, onFailure };
 
-    return from(ajax[ajaxMethodName](path, request))
-      .pipe(
-        map(
-          (response) => onSuccess(handlerConfig, request, response)
-        ),
-        catchError(
-          (response) => of(
-            onFailure(handlerConfig, request, response)
-          )
-        )
-      );
+    return from(ajax[ajaxMethodName](path, request)).pipe(
+      map(response => onSuccess(handlerConfig, request, response)),
+      catchError(response => of(onFailure(handlerConfig, request, response)))
+    );
   }
 
-  function onJsonApiResponse({actions, onFailure}, request, response) {
+  function onJsonApiResponse({ actions, onFailure }, request, response) {
     if (response.errors) {
-      return onFailure({actions}, request, response);
+      return onFailure({ actions }, request, response);
     }
-    const payload = {request, response};
+    const payload = { request, response };
     return actions.success(payload);
   }
 
-  function onJsonApiError({actions}, request, response) {
-    const payload = {request, errors: response.errors};
+  function onJsonApiError({ actions }, request, response) {
+    const payload = { request, errors: response.errors };
     return actions.failure(payload);
   }
 
   function epic(action$) {
-    return action$
-      .pipe(
-        filter(actions.wait),
-        switchMap(({payload}) => beforeSubmit(payload)),
-        switchMap(submit)
-      );
+    return action$.pipe(
+      filter(actions.wait),
+      switchMap(({ payload }) => beforeSubmit(payload)),
+      switchMap(submit)
+    );
   }
-  
+
   task.epic = epic;
 
   return task;
@@ -98,5 +90,8 @@ export default function generateEpic(
 
   config.ajax = config.ajax || ajaxObservable(config.getHeaders);
 
-  return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, config);
+  return generator(
+    { url, actions, onSuccess, onFailure, beforeSubmit },
+    config
+  );
 }

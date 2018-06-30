@@ -2,7 +2,9 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 
-import generateThunk, { getThunkCreator } from '../../src/redux-thunk/generateThunk';
+import generateThunk, {
+  getThunkCreator
+} from '../../src/redux-thunk/generateThunk';
 import createActionGroup from '../../src/createActionGroup';
 
 function createActions(base) {
@@ -120,7 +122,9 @@ describe('generateThunk', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums?sort=age');
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+        '/albums?sort=age'
+      );
     });
   });
 
@@ -206,7 +210,9 @@ describe('getThunkCreator', () => {
 
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
-    const thunk = getThunkCreator('getJSON', options, config)({ params: { id: '10' } });
+    const thunk = getThunkCreator('getJSON', options, config)({
+      params: { id: '10' }
+    });
 
     return thunk(dispatch).then(() => {
       expect(options.actions.wait.calledOnce).to.equal(true);
@@ -215,7 +221,9 @@ describe('getThunkCreator', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums/prefix_10');
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+        '/albums/prefix_10'
+      );
     });
   });
 
@@ -239,7 +247,9 @@ describe('getThunkCreator', () => {
 
     const config = { ajax: createMockAjax() };
     const dispatch = sinon.spy();
-    const thunk = getThunkCreator('getJSON', options, config)({ params: { id: '10' } });
+    const thunk = getThunkCreator('getJSON', options, config)({
+      params: { id: '10' }
+    });
 
     return thunk(dispatch).then(() => {
       expect(options.actions.wait.calledOnce).to.equal(true);
@@ -248,7 +258,9 @@ describe('getThunkCreator', () => {
       expect(dispatch.calledTwice).to.equal(true);
 
       expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums/prefix_10');
+      expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+        '/albums/prefix_10'
+      );
     });
   });
 });
