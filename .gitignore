@@ -15,6 +15,7 @@ build
 .build
 .grunt
 .idea
+.yarnclean
 
 env
 node_modules
