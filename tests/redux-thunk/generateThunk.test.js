@@ -25,7 +25,7 @@ function createMockAjax() {
   };
 }
 
-describe('generateThunk', () => {
+describe.only('generateThunk', () => {
   it('generates thunk for `create` operation that dispatches all the actions', () => {
     const options = {
       operation: 'create',
@@ -190,7 +190,7 @@ describe('generateThunk', () => {
 
   describe('getThunkCreator', () => {
     it('executes a custom beforeSubmit that retuns an action', () => {
-      function beforeSubmit({ request }) {
+      function beforeSubmit(request) {
         return {
           ...request,
           params: {
@@ -227,7 +227,7 @@ describe('generateThunk', () => {
     });
 
     it('executes a custom beforeSubmit that returns a Promise', () => {
-      function beforeSubmit({ request }) {
+      function beforeSubmit(request) {
         return Promise.resolve({
           ...request,
           params: {
