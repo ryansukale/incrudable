@@ -25,7 +25,7 @@ function createMockAjax() {
   };
 }
 
-describe.only('generateThunk', () => {
+describe('generateThunk', () => {
   it('generates thunk for `create` operation that dispatches all the actions', () => {
     const options = {
       operation: 'create',

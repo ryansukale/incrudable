@@ -18,7 +18,10 @@ export function onJsonApiResponse(
 }
 
 export function onJsonApiError({ actions, dispatch, done }, request, response) {
-  const payload = { request, errors: response.errors };
+  const payload = {
+    request,
+    errors: response.errors || response
+  };
   if (actions.failure) {
     dispatch(actions.failure(payload));
   }

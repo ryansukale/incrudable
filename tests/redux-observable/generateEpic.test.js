@@ -35,7 +35,6 @@ describe('generateEpic', () => {
 
       epic(action$).subscribe(() => {
         expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
-        console.log(options.actions.success.args[0][0])
         expect(options.actions.success.args[0][0]).to.deep.equal({
           request,
           response
