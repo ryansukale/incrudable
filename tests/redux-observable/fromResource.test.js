@@ -39,7 +39,7 @@ describe('redux-observable: fromResource', () => {
 
   it('generates a CREATE epic for a resource with actions', done => {
     const tasks = fromResource(resource, config);
-    const request = { body: 'hello' };
+    const request = { body: 'hello', params: { id: 10 } };
     const action$ = of(tasks.create(request));
 
     tasks.create.epic(action$).subscribe(({ payload }) => {
@@ -47,6 +47,7 @@ describe('redux-observable: fromResource', () => {
         request,
         response: { message: 'test postJSON ' }
       });
+      expect(config.ajax.postJSON.args[0][0]).to.equal('/albums/10/songs');
       done();
     });
   });
@@ -61,6 +62,7 @@ describe('redux-observable: fromResource', () => {
         request,
         response: { message: 'test getJSON ' }
       });
+      expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs/20');
       done();
     });
   });
@@ -75,6 +77,7 @@ describe('redux-observable: fromResource', () => {
         request,
         response: { message: 'test putJSON ' }
       });
+      expect(config.ajax.putJSON.args[0][0]).to.equal('/albums/10/songs/20');
       done();
     });
   });
@@ -89,13 +92,14 @@ describe('redux-observable: fromResource', () => {
         request,
         response: { message: 'test delJSON ' }
       });
+      expect(config.ajax.delJSON.args[0][0]).to.equal('/albums/10/songs/20');
       done();
     });
   });
 
   it('generates a LIST epic for a resource with actions', done => {
     const tasks = fromResource(resource, config);
-    const request = { params: { id: 10, songId: 20 } };
+    const request = { params: { id: 10 } };
     const action$ = of(tasks.create(request));
 
     tasks.list.epic(action$).subscribe(({ payload }) => {
@@ -103,6 +107,7 @@ describe('redux-observable: fromResource', () => {
         request,
         response: { message: 'test getJSON ' }
       });
+      expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs');
       done();
     });
   });
