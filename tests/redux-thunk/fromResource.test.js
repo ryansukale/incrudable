@@ -13,18 +13,19 @@ function createMockAjax() {
   };
 }
 
+const config = {};
+const resource = {
+  name: 'songs',
+  operations: {
+    create: '/albums/:id/songs',
+    read: '/albums/:id/songs/:songId',
+    update: '/albums/:id/songs/:songId',
+    del: '/albums/:id/songs/:songId',
+    list: '/albums/:id/songs'
+  }
+};
+
 describe('redux-thunk: fromResource', () => {
-  const config = {};
-  const resource = {
-    name: 'songs',
-    operations: {
-      create: '/albums/:id/songs',
-      read: '/albums/:id/songs/:songId',
-      update: '/albums/:id/songs/:songId',
-      del: '/albums/:id/songs/:songId',
-      list: '/albums/:id/songs'
-    }
-  };
   beforeEach(() => {
     config.ajax = createMockAjax();
   });
@@ -41,7 +42,7 @@ describe('redux-thunk: fromResource', () => {
         expect(dispatch.getCall(0).args).to.deep.equal([
           {
             type: 'CREATE_SONGS_WAIT',
-            payload: { request }
+            payload: request
           }
         ]);
         expect(dispatch.getCall(1).args).to.deep.equal([
@@ -70,7 +71,7 @@ describe('redux-thunk: fromResource', () => {
         expect(dispatch.getCall(0).args).to.deep.equal([
           {
             type: 'READ_SONGS_WAIT',
-            payload: { request }
+            payload: request
           }
         ]);
         expect(dispatch.getCall(1).args).to.deep.equal([
@@ -99,7 +100,7 @@ describe('redux-thunk: fromResource', () => {
         expect(dispatch.getCall(0).args).to.deep.equal([
           {
             type: 'UPDATE_SONGS_WAIT',
-            payload: { request }
+            payload: request
           }
         ]);
         expect(dispatch.getCall(1).args).to.deep.equal([
@@ -128,7 +129,7 @@ describe('redux-thunk: fromResource', () => {
         expect(dispatch.getCall(0).args).to.deep.equal([
           {
             type: 'DEL_SONGS_WAIT',
-            payload: { request }
+            payload: request
           }
         ]);
         expect(dispatch.getCall(1).args).to.deep.equal([
@@ -157,7 +158,7 @@ describe('redux-thunk: fromResource', () => {
         expect(dispatch.getCall(0).args).to.deep.equal([
           {
             type: 'LIST_SONGS_WAIT',
-            payload: { request }
+            payload: request
           }
         ]);
         expect(dispatch.getCall(1).args).to.deep.equal([

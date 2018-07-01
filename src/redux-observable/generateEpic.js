@@ -4,24 +4,24 @@ import createUrl from 'batarang/createUrl';
 
 import ajaxObservable from './ajaxObservable';
 
-function requestIdentity({ request }) {
-  return of(request);
+function identity(data) {
+  return of(data);
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
   const {
     url,
     actions,
-    beforeSubmit = requestIdentity,
+    beforeSubmit = identity,
     onSuccess = onJsonApiResponse,
     onFailure = onJsonApiError
   } = config;
 
   function task(request) {
-    return actions.wait({ request });
+    return actions.wait(request);
   }
 
-  function submit({ request }) {
+  function submit(request) {
     const path = createUrl(url, {
       params: request.params,
       query: request.query
@@ -52,7 +52,7 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
     return action$.pipe(
       filter(actions.wait),
       switchMap(({ payload }) => beforeSubmit(payload)),
-      switchMap(request => submit({ request }))
+      switchMap(submit)
     );
   }
 

@@ -34,7 +34,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.success.args[0][0]).to.deep.equal({
           request,
           response
@@ -57,7 +57,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.failure.args[0][0]).to.deep.equal({
           request,
           errors: response.errors
@@ -82,7 +82,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.success.args[0][0]).to.deep.equal({
           request,
           response
@@ -105,7 +105,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.failure.args[0][0]).to.deep.equal({
           request,
           errors: response.errors
@@ -130,7 +130,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.success.args[0][0]).to.deep.equal({
           request,
           response
@@ -153,7 +153,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.failure.args[0][0]).to.deep.equal({
           request,
           errors: response.errors
@@ -178,7 +178,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.success.args[0][0]).to.deep.equal({
           request,
           response
@@ -201,7 +201,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.failure.args[0][0]).to.deep.equal({
           request,
           errors: response.errors
@@ -226,7 +226,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.success.args[0][0]).to.deep.equal({
           request,
           response
@@ -249,7 +249,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.failure.args[0][0]).to.deep.equal({
           request,
           errors: response.errors
@@ -311,7 +311,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(actions.wait.args[0][0]).to.deep.equal(request);
         // Custom onSuccess is called
         expect(onSuccess.calledOnce).to.equal(true);
         // Default action is NOT called
@@ -337,7 +337,7 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(actions.wait.args[0][0]).to.deep.equal(request);
         // Custom onFailure is called
         expect(onFailure.calledOnce).to.equal(true);
         // Default action is NOT called
@@ -348,7 +348,7 @@ describe('generateEpic', () => {
 
     it('invokes the custom beforeSubmit function', done => {
       const prefix = 'prefix';
-      const beforeSubmit = sinon.spy(({ request }) => {
+      const beforeSubmit = sinon.spy((request) => {
         // Return a custom payload
         return of({
           params: {
@@ -368,11 +368,11 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(actions.wait.args[0][0]).to.deep.equal({ request });
+        expect(actions.wait.args[0][0]).to.deep.equal(request);
         // Custom beforeSubmit is called
         expect(beforeSubmit.calledOnce).to.equal(true);
         // BeforeSubmit is called with the same argument as the output of the wait action
-        expect(beforeSubmit.args[0][0]).to.deep.equal({ request });
+        expect(beforeSubmit.args[0][0]).to.deep.equal(request);
 
         // Ensure that the payload of the preprocessor is used as the request
         expect(getJSON.args[0][1]).to.deep.equal({
