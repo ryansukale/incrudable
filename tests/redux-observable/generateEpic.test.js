@@ -348,7 +348,7 @@ describe('generateEpic', () => {
 
     it('invokes the custom beforeSubmit function', done => {
       const prefix = 'prefix';
-      const beforeSubmit = sinon.spy((request) => {
+      const beforeSubmit = sinon.spy(request => {
         // Return a custom payload
         return of({
           params: {
