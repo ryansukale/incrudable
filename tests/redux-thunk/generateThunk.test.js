@@ -25,7 +25,7 @@ function createMockAjax() {
   };
 }
 
-describe('generateThunk', () => {
+describe.only('generateThunk', () => {
   it('generates thunk for `create` operation that dispatches all the actions', () => {
     const options = {
       operation: 'create',
@@ -187,80 +187,80 @@ describe('generateThunk', () => {
       expect(args[2]).to.equal('getJSON');
     });
   });
-});
 
-describe('getThunkCreator', () => {
-  it('executes a custom beforeSubmit that retuns an action', () => {
-    function beforeSubmit(request) {
-      return {
-        ...request,
-        params: {
-          id: `prefix_${request.params.id}`
-        }
+  describe('getThunkCreator', () => {
+    it('executes a custom beforeSubmit that retuns an action', () => {
+      function beforeSubmit({ request }) {
+        return {
+          ...request,
+          params: {
+            id: `prefix_${request.params.id}`
+          }
+        };
+      }
+
+      const options = {
+        operation: 'read',
+        actions: createActions('READ_ALBUMS'),
+        url: '/albums/:id',
+        beforeSubmit
       };
-    }
+      sinon.spy(options, 'beforeSubmit');
 
-    const options = {
-      operation: 'read',
-      actions: createActions('READ_ALBUMS'),
-      url: '/albums/:id',
-      beforeSubmit
-    };
-    sinon.spy(options, 'beforeSubmit');
-
-    const config = { ajax: createMockAjax() };
-    const dispatch = sinon.spy();
-    const thunk = getThunkCreator('getJSON', options, config)({
-      params: { id: '10' }
-    });
-
-    return thunk(dispatch).then(() => {
-      expect(options.actions.wait.calledOnce).to.equal(true);
-      expect(options.beforeSubmit.calledOnce).to.equal(true);
-      expect(options.actions.success.calledOnce).to.equal(true);
-      expect(dispatch.calledTwice).to.equal(true);
-
-      expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
-        '/albums/prefix_10'
-      );
-    });
-  });
-
-  it('executes a custom beforeSubmit that returns a Promise', () => {
-    function beforeSubmit(request) {
-      return Promise.resolve({
-        ...request,
-        params: {
-          id: `prefix_${request.params.id}`
-        }
+      const config = { ajax: createMockAjax() };
+      const dispatch = sinon.spy();
+      const thunk = getThunkCreator('getJSON', options, config)({
+        params: { id: '10' }
       });
-    }
 
-    const options = {
-      operation: 'read',
-      actions: createActions('READ_ALBUMS'),
-      url: '/albums/:id',
-      beforeSubmit
-    };
-    sinon.spy(options, 'beforeSubmit');
+      return thunk(dispatch).then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.beforeSubmit.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
 
-    const config = { ajax: createMockAjax() };
-    const dispatch = sinon.spy();
-    const thunk = getThunkCreator('getJSON', options, config)({
-      params: { id: '10' }
+        expect(config.ajax.getJSON.calledOnce);
+        expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+          '/albums/prefix_10'
+        );
+      });
     });
 
-    return thunk(dispatch).then(() => {
-      expect(options.actions.wait.calledOnce).to.equal(true);
-      expect(options.beforeSubmit.calledOnce).to.equal(true);
-      expect(options.actions.success.calledOnce).to.equal(true);
-      expect(dispatch.calledTwice).to.equal(true);
+    it('executes a custom beforeSubmit that returns a Promise', () => {
+      function beforeSubmit({ request }) {
+        return Promise.resolve({
+          ...request,
+          params: {
+            id: `prefix_${request.params.id}`
+          }
+        });
+      }
 
-      expect(config.ajax.getJSON.calledOnce);
-      expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
-        '/albums/prefix_10'
-      );
+      const options = {
+        operation: 'read',
+        actions: createActions('READ_ALBUMS'),
+        url: '/albums/:id',
+        beforeSubmit
+      };
+      sinon.spy(options, 'beforeSubmit');
+
+      const config = { ajax: createMockAjax() };
+      const dispatch = sinon.spy();
+      const thunk = getThunkCreator('getJSON', options, config)({
+        params: { id: '10' }
+      });
+
+      return thunk(dispatch).then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.beforeSubmit.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.getJSON.calledOnce);
+        expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+          '/albums/prefix_10'
+        );
+      });
     });
   });
 });

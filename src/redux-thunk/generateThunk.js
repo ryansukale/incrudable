@@ -3,8 +3,8 @@ import createUrl from 'batarang/createUrl';
 import { onJsonApiResponse, onJsonApiError } from './handlers';
 import ajaxPromise from './ajaxPromise';
 
-function identity(data) {
-  return Promise.resolve(data);
+function requestIdentity({ request }) {
+  return Promise.resolve(request);
 }
 
 export function getThunkCreator(ajaxMethodName, config, { ajax }) {
@@ -13,18 +13,18 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
       const {
         url,
         actions,
-        beforeSubmit = identity,
+        beforeSubmit = requestIdentity,
         onSuccess = onJsonApiResponse,
         onFailure = onJsonApiError
       } = config;
 
-      const actionObject = actions.wait(request);
+      const actionObject = actions.wait({ request });
 
       dispatch(actionObject);
 
       const handlerConfig = { actions, dispatch, onFailure, done };
 
-      function submit(request) {
+      function submit({ request }) {
         const path = createUrl(url, {
           params: request.params,
           query: request.query
@@ -34,7 +34,7 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
 
       return Promise.resolve(1)
         .then(() => beforeSubmit(actionObject.payload))
-        .then(submit)
+        .then(request => submit({ request }))
         .then(response => {
           return onSuccess(handlerConfig, request, response);
         })
