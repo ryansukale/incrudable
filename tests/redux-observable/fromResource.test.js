@@ -48,7 +48,7 @@ describe('redux-observable: fromResource', () => {
     const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
     const action$ = of(tasks[operation](request));
 
-    tasks[operation].beforeSubmit = sinon.spy(request => of(customRequest));
+    tasks[operation].beforeSubmit = sinon.spy(() => of(customRequest));
 
     tasks[operation].epic(action$).subscribe(({ payload }) => {
       expect(payload.request).to.deep.equal(customRequest);

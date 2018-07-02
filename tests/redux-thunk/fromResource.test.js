@@ -27,12 +27,26 @@ const resource = {
   }
 };
 
+function testCustomBeforeSubmit(operation) {
+  const tasks = fromResource(resource, config);
+  const request = { body: 'hello', params: { id: 10, songId: 20 } };
+  const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+  const dispatch = sinon.spy();
+
+  tasks[operation].beforeSubmit = sinon.spy(() => customRequest);
+
+  return tasks[operation](request)(dispatch)
+    .then(() => {
+      expect(tasks[operation].beforeSubmit.calledOnce).to.equal(true);
+    });
+}
+
 describe('redux-thunk: fromResource', () => {
   beforeEach(() => {
     config.ajax = createMockSuccessAjax();
   });
 
-  describe('"create" operation', () => {
+  describe('create operation', () => {
     it('generates a CREATE thunk for a resource with actions', () => {
       const thunks = fromResource(resource, config);
       const dispatch = sinon.spy();
@@ -61,121 +75,149 @@ describe('redux-thunk: fromResource', () => {
           );
         });
     });
+
+    it('allows a custom beforeSubmit', () => {
+      return testCustomBeforeSubmit('create');
+    });
   });
 
-  it('generates a READ thunk for a resource with actions', () => {
-    const thunks = fromResource(resource, config);
-    const dispatch = sinon.spy();
-    const request = { params: { id: 10, songId: 20 } };
+  describe('read operation', () => {
+    it('generates a READ thunk for a resource with actions', () => {
+      const thunks = fromResource(resource, config);
+      const dispatch = sinon.spy();
+      const request = { params: { id: 10, songId: 20 } };
 
-    return thunks
-      .read(request)(dispatch)
-      .then(() => {
-        expect(dispatch.calledTwice).to.equal(true);
-        expect(dispatch.getCall(0).args).to.deep.equal([
-          {
-            type: 'READ_SONGS_WAIT',
-            payload: request
-          }
-        ]);
-        expect(dispatch.getCall(1).args).to.deep.equal([
-          {
-            type: 'READ_SONGS_SUCCESS',
-            payload: { request, response: 'test getJSON' }
-          }
-        ]);
+      return thunks
+        .read(request)(dispatch)
+        .then(() => {
+          expect(dispatch.calledTwice).to.equal(true);
+          expect(dispatch.getCall(0).args).to.deep.equal([
+            {
+              type: 'READ_SONGS_WAIT',
+              payload: request
+            }
+          ]);
+          expect(dispatch.getCall(1).args).to.deep.equal([
+            {
+              type: 'READ_SONGS_SUCCESS',
+              payload: { request, response: 'test getJSON' }
+            }
+          ]);
 
-        expect(config.ajax.getJSON.calledOnce);
-        expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
-          '/albums/10/songs/20'
-        );
-      });
+          expect(config.ajax.getJSON.calledOnce);
+          expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+            '/albums/10/songs/20'
+          );
+        });
+    });
+
+    it('allows a custom beforeSubmit', () => {
+      return testCustomBeforeSubmit('read');
+    });
   });
 
-  it('generates a UPDATE thunk for a resource with actions', () => {
-    const thunks = fromResource(resource, config);
-    const dispatch = sinon.spy();
-    const request = { body: 'hello' };
+  describe('update operation', () => {
+    it('generates a UPDATE thunk for a resource with actions', () => {
+      const thunks = fromResource(resource, config);
+      const dispatch = sinon.spy();
+      const request = { body: 'hello' };
 
-    return thunks
-      .update(request)(dispatch)
-      .then(() => {
-        expect(dispatch.calledTwice).to.equal(true);
-        expect(dispatch.getCall(0).args).to.deep.equal([
-          {
-            type: 'UPDATE_SONGS_WAIT',
-            payload: request
-          }
-        ]);
-        expect(dispatch.getCall(1).args).to.deep.equal([
-          {
-            type: 'UPDATE_SONGS_SUCCESS',
-            payload: { request, response: 'test putJSON' }
-          }
-        ]);
+      return thunks
+        .update(request)(dispatch)
+        .then(() => {
+          expect(dispatch.calledTwice).to.equal(true);
+          expect(dispatch.getCall(0).args).to.deep.equal([
+            {
+              type: 'UPDATE_SONGS_WAIT',
+              payload: request
+            }
+          ]);
+          expect(dispatch.getCall(1).args).to.deep.equal([
+            {
+              type: 'UPDATE_SONGS_SUCCESS',
+              payload: { request, response: 'test putJSON' }
+            }
+          ]);
 
-        expect(config.ajax.putJSON.calledOnce);
-        expect(config.ajax.putJSON.firstCall.args[0]).to.equal(
-          resource.operations.update
-        );
-      });
+          expect(config.ajax.putJSON.calledOnce);
+          expect(config.ajax.putJSON.firstCall.args[0]).to.equal(
+            resource.operations.update
+          );
+        });
+    });
+
+    it('allows a custom beforeSubmit', () => {
+      return testCustomBeforeSubmit('update');
+    });
   });
 
-  it('generates a DELETE thunk for a resource with actions', () => {
-    const thunks = fromResource(resource, config);
-    const dispatch = sinon.spy();
-    const request = { params: { id: 10, songId: 20 } };
+  describe('del operation', () => {
+    it('generates a DELETE thunk for a resource with actions', () => {
+      const thunks = fromResource(resource, config);
+      const dispatch = sinon.spy();
+      const request = { params: { id: 10, songId: 20 } };
 
-    return thunks
-      .del(request)(dispatch)
-      .then(() => {
-        expect(dispatch.calledTwice).to.equal(true);
-        expect(dispatch.getCall(0).args).to.deep.equal([
-          {
-            type: 'DEL_SONGS_WAIT',
-            payload: request
-          }
-        ]);
-        expect(dispatch.getCall(1).args).to.deep.equal([
-          {
-            type: 'DEL_SONGS_SUCCESS',
-            payload: { request, response: 'test delJSON' }
-          }
-        ]);
+      return thunks
+        .del(request)(dispatch)
+        .then(() => {
+          expect(dispatch.calledTwice).to.equal(true);
+          expect(dispatch.getCall(0).args).to.deep.equal([
+            {
+              type: 'DEL_SONGS_WAIT',
+              payload: request
+            }
+          ]);
+          expect(dispatch.getCall(1).args).to.deep.equal([
+            {
+              type: 'DEL_SONGS_SUCCESS',
+              payload: { request, response: 'test delJSON' }
+            }
+          ]);
 
-        expect(config.ajax.delJSON.calledOnce);
-        expect(config.ajax.delJSON.firstCall.args[0]).to.equal(
-          '/albums/10/songs/20'
-        );
-      });
+          expect(config.ajax.delJSON.calledOnce);
+          expect(config.ajax.delJSON.firstCall.args[0]).to.equal(
+            '/albums/10/songs/20'
+          );
+        });
+    });
+
+    it('allows a custom beforeSubmit', () => {
+      return testCustomBeforeSubmit('update');
+    });
   });
 
-  it('generates a LIST thunk for a resource with actions', () => {
-    const thunks = fromResource(resource, config);
-    const dispatch = sinon.spy();
-    const request = { body: 'hello', params: { id: 10 } };
+  describe('del operation', () => {
+    it('generates a LIST thunk for a resource with actions', () => {
+      const thunks = fromResource(resource, config);
+      const dispatch = sinon.spy();
+      const request = { body: 'hello', params: { id: 10 } };
 
-    return thunks
-      .list(request)(dispatch)
-      .then(() => {
-        expect(dispatch.calledTwice).to.equal(true);
-        expect(dispatch.getCall(0).args).to.deep.equal([
-          {
-            type: 'LIST_SONGS_WAIT',
-            payload: request
-          }
-        ]);
-        expect(dispatch.getCall(1).args).to.deep.equal([
-          {
-            type: 'LIST_SONGS_SUCCESS',
-            payload: { request, response: 'test getJSON' }
-          }
-        ]);
+      return thunks
+        .list(request)(dispatch)
+        .then(() => {
+          expect(dispatch.calledTwice).to.equal(true);
+          expect(dispatch.getCall(0).args).to.deep.equal([
+            {
+              type: 'LIST_SONGS_WAIT',
+              payload: request
+            }
+          ]);
+          expect(dispatch.getCall(1).args).to.deep.equal([
+            {
+              type: 'LIST_SONGS_SUCCESS',
+              payload: { request, response: 'test getJSON' }
+            }
+          ]);
 
-        expect(config.ajax.getJSON.calledOnce);
-        expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
-          '/albums/10/songs'
-        );
-      });
+          expect(config.ajax.getJSON.calledOnce);
+          expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+            '/albums/10/songs'
+          );
+        });
+    });
+
+    it('allows a custom beforeSubmit', () => {
+      return testCustomBeforeSubmit('del');
+    });
   });
 });
