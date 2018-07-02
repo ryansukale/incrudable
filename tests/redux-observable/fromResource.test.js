@@ -4,29 +4,24 @@ import sinon from 'sinon';
 import { of, throwError } from 'rxjs';
 
 import fromResource from '../../src/redux-observable/fromResource';
-const errorUtil = () => throwError('error');
+const errorUtil = message => () => throwError(`error ${message}`);
+const successUtil = message => () => of({ message: `test ${message}` });
 
 function createMockSuccessAjax() {
   return {
-    postJSON: sinon
-      .stub()
-      .returns(Promise.resolve({ message: 'test postJSON ' })),
-    getJSON: sinon
-      .stub()
-      .returns(Promise.resolve({ message: 'test getJSON ' })),
-    putJSON: sinon
-      .stub()
-      .returns(Promise.resolve({ message: 'test putJSON ' })),
-    delJSON: sinon.stub().returns(Promise.resolve({ message: 'test delJSON ' }))
+    postJSON: sinon.spy(successUtil('postJSON')),
+    getJSON: sinon.spy(successUtil('getJSON')),
+    putJSON: sinon.spy(successUtil('putJSON')),
+    delJSON: sinon.spy(successUtil('delJSON'))
   };
 }
 
 function createMockFailureAjax() {
   return {
-    postJSON: sinon.spy(errorUtil),
-    getJSON: sinon.spy(errorUtil),
-    putJSON: sinon.spy(errorUtil),
-    delJSON: sinon.spy(errorUtil)
+    postJSON: sinon.spy(errorUtil('postJSON')),
+    getJSON: sinon.spy(errorUtil('getJSON')),
+    putJSON: sinon.spy(errorUtil('putJSON')),
+    delJSON: sinon.spy(errorUtil('delJSON'))
   };
 }
 
@@ -78,6 +73,23 @@ describe('redux-observable: fromResource', () => {
     });
   }
 
+  function testCustomOnSuccess(operation, done) {
+    const tasks = fromResource(resource, config);
+    const request = { body: 'hello', params: { id: 10, songId: 20 } };
+    const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+    const action$ = of(tasks[operation](request));
+
+    tasks[operation].onSuccess = sinon.spy(({ payload }) => ({
+      type: 'CUSTOM_SUCCESS',
+      payload
+    }));
+    
+    tasks[operation].epic(action$).subscribe(({ payload }) => {
+      expect(tasks[operation].onSuccess.calledOnce).to.equal(true);
+      done();
+    });
+  }
+
   describe('create operation', done => {
     it('generates a CREATE epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
@@ -87,7 +99,7 @@ describe('redux-observable: fromResource', () => {
       tasks.create.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
-          response: { message: 'test postJSON ' }
+          response: { message: 'test postJSON' }
         });
         expect(config.ajax.postJSON.args[0][0]).to.equal('/albums/10/songs');
         done();
@@ -101,6 +113,10 @@ describe('redux-observable: fromResource', () => {
     it('allows a custom onFailure', done => {
       testCustomOnFailure('create', done);
     });
+
+    it('allows a custom onSuccess', done => {
+      testCustomOnSuccess('create', done);
+    });
   });
 
   describe('read operation', done => {
@@ -112,7 +128,7 @@ describe('redux-observable: fromResource', () => {
       tasks.read.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
-          response: { message: 'test getJSON ' }
+          response: { message: 'test getJSON' }
         });
         expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs/20');
         done();
@@ -126,6 +142,10 @@ describe('redux-observable: fromResource', () => {
     it('allows a custom onFailure', done => {
       testCustomOnFailure('read', done);
     });
+
+    it('allows a custom onSuccess', done => {
+      testCustomOnSuccess('read', done);
+    });
   });
 
   describe('update operation', done => {
@@ -137,7 +157,7 @@ describe('redux-observable: fromResource', () => {
       tasks.update.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
-          response: { message: 'test putJSON ' }
+          response: { message: 'test putJSON' }
         });
         expect(config.ajax.putJSON.args[0][0]).to.equal('/albums/10/songs/20');
         done();
@@ -151,6 +171,10 @@ describe('redux-observable: fromResource', () => {
     it('allows a custom onFailure', done => {
       testCustomOnFailure('update', done);
     });
+
+    it('allows a custom onSuccess', done => {
+      testCustomOnSuccess('update', done);
+    });
   });
 
   describe('del operation', done => {
@@ -162,7 +186,7 @@ describe('redux-observable: fromResource', () => {
       tasks.del.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
-          response: { message: 'test delJSON ' }
+          response: { message: 'test delJSON' }
         });
         expect(config.ajax.delJSON.args[0][0]).to.equal('/albums/10/songs/20');
         done();
@@ -174,6 +198,10 @@ describe('redux-observable: fromResource', () => {
 
       it('allows a custom onFailure', done => {
         testCustomOnFailure('del', done);
+      });
+
+      it('allows a custom onSuccess', done => {
+        testCustomOnSuccess('del', done);
       });
     });
   });
@@ -187,7 +215,7 @@ describe('redux-observable: fromResource', () => {
       tasks.list.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
-          response: { message: 'test getJSON ' }
+          response: { message: 'test getJSON' }
         });
         expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs');
         done();
@@ -200,6 +228,10 @@ describe('redux-observable: fromResource', () => {
 
     it('allows a custom onFailure', done => {
       testCustomOnFailure('list', done);
+    });
+
+    it('allows a custom onSuccess', done => {
+      testCustomOnSuccess('list', done);
     });
   });
 });
