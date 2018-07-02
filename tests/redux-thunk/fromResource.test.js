@@ -3,13 +3,15 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import fromResource from '../../src/redux-thunk/fromResource';
+// const errorUtil = message => () => throw Error(`error ${message}`);
+const successUtil = message => () => Promise.resolve(`test ${message}`);
 
-function createMockAjax() {
+function createMockSuccessAjax() {
   return {
-    postJSON: sinon.stub().returns(Promise.resolve('test postJSON')),
-    getJSON: sinon.stub().returns(Promise.resolve('test getJSON')),
-    putJSON: sinon.stub().returns(Promise.resolve('test putJSON')),
-    delJSON: sinon.stub().returns(Promise.resolve('test delJSON'))
+    postJSON: sinon.spy(successUtil('postJSON')),
+    getJSON: sinon.spy(successUtil('getJSON')),
+    putJSON: sinon.spy(successUtil('putJSON')),
+    delJSON: sinon.spy(successUtil('delJSON'))
   };
 }
 
@@ -27,36 +29,38 @@ const resource = {
 
 describe('redux-thunk: fromResource', () => {
   beforeEach(() => {
-    config.ajax = createMockAjax();
+    config.ajax = createMockSuccessAjax();
   });
 
-  it('generates a CREATE thunk for a resource with actions', () => {
-    const thunks = fromResource(resource, config);
-    const dispatch = sinon.spy();
-    const request = { body: 'hello', params: { id: 10 } };
+  describe('"create" operation', () => {
+    it('generates a CREATE thunk for a resource with actions', () => {
+      const thunks = fromResource(resource, config);
+      const dispatch = sinon.spy();
+      const request = { body: 'hello', params: { id: 10 } };
 
-    return thunks
-      .create(request)(dispatch)
-      .then(() => {
-        expect(dispatch.calledTwice).to.equal(true);
-        expect(dispatch.getCall(0).args).to.deep.equal([
-          {
-            type: 'CREATE_SONGS_WAIT',
-            payload: request
-          }
-        ]);
-        expect(dispatch.getCall(1).args).to.deep.equal([
-          {
-            type: 'CREATE_SONGS_SUCCESS',
-            payload: { request, response: 'test postJSON' }
-          }
-        ]);
+      return thunks
+        .create(request)(dispatch)
+        .then(() => {
+          expect(dispatch.calledTwice).to.equal(true);
+          expect(dispatch.getCall(0).args).to.deep.equal([
+            {
+              type: 'CREATE_SONGS_WAIT',
+              payload: request
+            }
+          ]);
+          expect(dispatch.getCall(1).args).to.deep.equal([
+            {
+              type: 'CREATE_SONGS_SUCCESS',
+              payload: { request, response: 'test postJSON' }
+            }
+          ]);
 
-        expect(config.ajax.postJSON.calledOnce);
-        expect(config.ajax.postJSON.firstCall.args[0]).to.equal(
-          '/albums/10/songs'
-        );
-      });
+          expect(config.ajax.postJSON.calledOnce);
+          expect(config.ajax.postJSON.firstCall.args[0]).to.equal(
+            '/albums/10/songs'
+          );
+        });
+    });
   });
 
   it('generates a READ thunk for a resource with actions', () => {
