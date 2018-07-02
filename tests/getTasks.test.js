@@ -6,23 +6,23 @@ import getTasks from '../src/getTasks';
 import getActionGroups from '../src/getActionGroups';
 
 const resources = {
-  albums: {
-    name: 'albums',
+  songs: {
+    name: 'songs',
     operations: {
-      create: '/albums/:id/songs',
-      read: '/albums/:id/songs/:song_id'
+      create: '/songs/:id/songs',
+      read: '/songs/:id/songs/:song_id'
     }
   }
 };
 
 describe('getTasks', () => {
   it('generates tasks using a taskGenerator resources', () => {
-    const { albums } = resources;
+    const { songs } = resources;
     const mockGenerator = () => () => {};
     const generatorSpy = sinon.spy(mockGenerator);
 
-    const actionGroups = getActionGroups(albums, albums.operations);
-    const tasks = getTasks(generatorSpy, albums, actionGroups);
+    const actionGroups = getActionGroups(songs, songs.operations);
+    const tasks = getTasks(generatorSpy, songs, actionGroups);
 
     expect(tasks.create).to.be.a('function');
     expect(tasks.create.success).to.equal(actionGroups.create.success);
