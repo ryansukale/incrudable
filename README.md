@@ -32,9 +32,7 @@ Incrudable attempts to solve this problem of writing boilerplate code by providi
 #### redux-thunks
 
 ```js
-// File: modules/songs/resources.js
-import incrudable from 'incrudable/lib/redux-thunk';
-
+// File: modules/resources.js
 // Define the configuration for your resources as follows
 const resources = {
   songs: {
@@ -52,8 +50,10 @@ const resources = {
 
 ```js
 // File: /modules/thunks/songs.js
-import fromResource from 'incrudable/lib/redux-thunks/fromResource';
-const thunks = fromResource(resources.songs);
+import incrudable from 'incrudable/lib/redux-thunks';
+import resources from '/modules/resources';
+
+const thunks = incrudable.fromResource(resources.songs);
 export default thunks;
 
 /** This returns an object with the following properties corresponding to crud operations
@@ -82,10 +82,10 @@ dispatch(songs.list(payload));
 ```
 
 ```js
-// reducers/modules/songs.js
+// File: modules/songs/reducer.js
 import {songs} from 'modules/songs/thunks';
 
-// Your reducer now automatically has access to three events
+// Your reducer now automatically has access to three events on each crud operation of the resource
 function songssReducer(state, {action, payload}) {
   switch (action) {
     case songs.create.success:
@@ -129,9 +129,11 @@ const payload = {query: {genre: 'trance'}};
 dispatch(
   songs.list(payload, {actions: songActions.filter})
 );
+```
 
-// In your reducers, you can listen as follows
-import {songs} from 'modules/songs/resources';
+```js
+// File: modules/songs/reducer.js
+import {songs} from 'modules/songs/thunks';
 import songActions from 'modules/songs/actions';
 
 // Plain old switch based reducers
