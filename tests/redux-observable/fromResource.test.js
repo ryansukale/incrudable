@@ -52,6 +52,22 @@ describe('redux-observable: fromResource', () => {
     });
   });
 
+  it('allows adding an beforeSubmit after task has been created', done => {
+    const tasks = fromResource(resource, config);
+    const request = { body: 'hello', params: { id: 10 } };
+    const action$ = of(tasks.create(request));
+    const customRequest = {body: 'hello', params: {id: 'custom'}};
+
+    tasks.create.beforeSubmit = sinon.spy(request => {
+      return of(customRequest);
+    });
+
+    tasks.create.epic(action$).subscribe(({ payload }) => {
+      expect(payload.request).to.deep.equal(customRequest);
+      done();
+    });
+  });
+
   it('generates a READ epic for a resource with actions', done => {
     const tasks = fromResource(resource, config);
     const request = { params: { id: 10, songId: 20 } };
