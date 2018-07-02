@@ -83,7 +83,7 @@ dispatch(songs.list(payload));
 
 ```js
 // reducers/modules/songs.js
-import {songs} from './thunks/create';
+import {songs} from 'modules/songs/thunks';
 
 // Your reducer now automatically has access to three events
 function songssReducer(state, {action, payload}) {
@@ -103,48 +103,50 @@ function songssReducer(state, {action, payload}) {
       return {...};
   }
 }
-
+```
 ---
 
-You can reuse thunks and export custom actions. This comes in handy when you want to perform the operation of a thunk like fetching a list of things when filtering, sorting, etc but want to dispatch custom actions based on business your business logic / query criteria.
+You can reuse thunks and export custom actions. This comes in handy when you want to perform the operation of a thunk like fetching a list of things when filtering, sorting, etc but want to dispatch custom actions names based on business your business logic / query criteria.
 
 ```js
 // modules/albums/filter.js
 import createActionGroup from 'incrudable/lib/createActionGroup';
 
-import {albums} from 'modules/albums/resources';
+import {albums} from 'modules/songs/resources';
 
 // Create and export your application specific action group
-export const filterAlbumActions = createActionGroup('FILTER_BY_GENRE');
-
+// File: modules/songs/actions.js
+export default {
+    filter: createActionGroup('FILTER_SONGS'),
+    sort: createActionGroup('SORT_SONGS')
+};
+```
+```js
 // Reuse the list thunk, but dispatch your custom action groups
+// File: components/songs/List.jsx
+import songActions from 'modules/songs/actions';
 const payload = {query: {genre: 'trance'}};
 dispatch(
-  albums.list(payload, {actions: filterAlbumActions})
+  songs.list(payload, {actions: songActions.filter})
 );
 
 // In your reducers, you can listen as follows
-import {albums} from 'modules/albums/resources';
-import filterAlbumActions from 'modules/albums/filter';
-
-const {create} = albums;
+import {songs} from 'modules/songs/resources';
+import songActions from 'modules/songs/actions';
 
 // Plain old switch based reducers
 function albumsReducer(state, {action, payload}) {
   switch (action) {
-    case create.success:
+    case songs.create.success:
       return {latest: payload};
-    case create.error:
-      return {errors: payload};
-    case create.wait:
-      return {isLoading: true};
-
-    // Handle your custom action group
-    case filterActions.success:
+    // ... existing action handlers
+    
+    // Custom action handlers
+    case songActions.filter.success:
       return {by_genre: payload};
-    case filterActions.error:
+    case songActionsfilter.error:
       return {errors: payload};
-    case filterActions.wait:
+    case songActions.filter.wait:
       return {isFiltering: true};
   }
 }
