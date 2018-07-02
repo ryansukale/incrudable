@@ -3,15 +3,24 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import fromResource from '../../src/redux-thunk/fromResource';
-// const errorUtil = message => () => throw Error(`error ${message}`);
+const errorUtil = message => () => Promise.reject(`error ${message}`);
 const successUtil = message => () => Promise.resolve(`test ${message}`);
 
-function createMockSuccessAjax() {
+function createSpySuccessAjax() {
   return {
     postJSON: sinon.spy(successUtil('postJSON')),
     getJSON: sinon.spy(successUtil('getJSON')),
     putJSON: sinon.spy(successUtil('putJSON')),
     delJSON: sinon.spy(successUtil('delJSON'))
+  };
+}
+
+function createSpyFailureAjax() {
+  return {
+    postJSON: sinon.spy(errorUtil('postJSON')),
+    getJSON: sinon.spy(errorUtil('getJSON')),
+    putJSON: sinon.spy(errorUtil('putJSON')),
+    delJSON: sinon.spy(errorUtil('delJSON'))
   };
 }
 
@@ -41,9 +50,37 @@ function testCustomBeforeSubmit(operation) {
     });
 }
 
+function testCustomOnFailure(operation) {
+  const tasks = fromResource(resource, { ajax: createSpyFailureAjax()});
+  const request = { body: 'hello', params: { id: 10, songId: 20 } };
+  const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+  const dispatch = sinon.spy();
+
+  tasks[operation].onFailure = sinon.spy();
+
+  return tasks[operation](request)(dispatch)
+    .then(() => {
+      expect(tasks[operation].onFailure.calledOnce).to.equal(true);
+    });
+}
+
+function testCustomOnSuccess(operation) {
+  const tasks = fromResource(resource, config);
+  const request = { body: 'hello', params: { id: 10, songId: 20 } };
+  const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+  const dispatch = sinon.spy();
+
+  tasks[operation].onSuccess = sinon.spy();
+
+  return tasks[operation](request)(dispatch)
+    .then(() => {
+      expect(tasks[operation].onSuccess.calledOnce).to.equal(true);
+    });
+}
+
 describe('redux-thunk: fromResource', () => {
   beforeEach(() => {
-    config.ajax = createMockSuccessAjax();
+    config.ajax = createSpySuccessAjax();
   });
 
   describe('create operation', () => {
@@ -78,6 +115,14 @@ describe('redux-thunk: fromResource', () => {
 
     it('allows a custom beforeSubmit', () => {
       return testCustomBeforeSubmit('create');
+    });
+
+    it('allows a custom onFailure', () => {
+      return testCustomOnFailure('create');
+    });
+
+    it('allows a custom onSuccess', () => {
+      return testCustomOnSuccess('create');
     });
   });
 
@@ -114,6 +159,14 @@ describe('redux-thunk: fromResource', () => {
     it('allows a custom beforeSubmit', () => {
       return testCustomBeforeSubmit('read');
     });
+
+    it('allows a custom onFailure', () => {
+      return testCustomOnFailure('read');
+    });
+
+    it('allows a custom onSuccess', () => {
+      return testCustomOnSuccess('read');
+    });
   });
 
   describe('update operation', () => {
@@ -149,6 +202,14 @@ describe('redux-thunk: fromResource', () => {
     it('allows a custom beforeSubmit', () => {
       return testCustomBeforeSubmit('update');
     });
+
+    it('allows a custom onFailure', () => {
+      return testCustomOnFailure('update');
+    });
+
+    it('allows a custom onSuccess', () => {
+      return testCustomOnSuccess('update');
+    });
   });
 
   describe('del operation', () => {
@@ -182,11 +243,19 @@ describe('redux-thunk: fromResource', () => {
     });
 
     it('allows a custom beforeSubmit', () => {
-      return testCustomBeforeSubmit('update');
+      return testCustomBeforeSubmit('del');
+    });
+
+    it('allows a custom onFailure', () => {
+      return testCustomOnFailure('del');
+    });
+
+    it('allows a custom onSuccess', () => {
+      return testCustomOnSuccess('del');
     });
   });
 
-  describe('del operation', () => {
+  describe('list operation', () => {
     it('generates a LIST thunk for a resource with actions', () => {
       const thunks = fromResource(resource, config);
       const dispatch = sinon.spy();
@@ -217,7 +286,15 @@ describe('redux-thunk: fromResource', () => {
     });
 
     it('allows a custom beforeSubmit', () => {
-      return testCustomBeforeSubmit('del');
+      return testCustomBeforeSubmit('list');
+    });
+
+    it('allows a custom onFailure', () => {
+      return testCustomOnFailure('list');
+    });
+
+    it('allows a custom onSuccess', () => {
+      return testCustomOnSuccess('list');
     });
   });
 });

@@ -7,7 +7,7 @@ import fromResource from '../../src/redux-observable/fromResource';
 const errorUtil = message => () => throwError(`error ${message}`);
 const successUtil = message => () => of({ message: `test ${message}` });
 
-function createMockSuccessAjax() {
+function createSpySuccessAjax() {
   return {
     postJSON: sinon.spy(successUtil('postJSON')),
     getJSON: sinon.spy(successUtil('getJSON')),
@@ -16,7 +16,7 @@ function createMockSuccessAjax() {
   };
 }
 
-function createMockFailureAjax() {
+function createSpyFailureAjax() {
   return {
     postJSON: sinon.spy(errorUtil('postJSON')),
     getJSON: sinon.spy(errorUtil('getJSON')),
@@ -39,7 +39,7 @@ const resource = {
 
 describe('redux-observable: fromResource', () => {
   beforeEach(() => {
-    config.ajax = createMockSuccessAjax();
+    config.ajax = createSpySuccessAjax();
   });
 
   function testCustomBeforeSubmit(operation, done) {
@@ -57,7 +57,7 @@ describe('redux-observable: fromResource', () => {
   }
 
   function testCustomOnFailure(operation, done) {
-    const tasks = fromResource(resource, {ajax: createMockFailureAjax()});
+    const tasks = fromResource(resource, {ajax: createSpyFailureAjax()});
     const request = { body: 'hello', params: { id: 10, songId: 20 } };
     const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
     const action$ = of(tasks[operation](request));

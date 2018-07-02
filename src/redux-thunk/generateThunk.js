@@ -12,13 +12,13 @@ export function getThunkCreator(ajaxMethodName, config, { ajax }) {
     return dispatch => {
       const {
         url,
-        actions,
-        onSuccess = onJsonApiResponse,
-        onFailure = onJsonApiError
+        actions
       } = config;
 
       const actionObject = actions.wait(request);
       const beforeSubmit = thunk.beforeSubmit || config.beforeSubmit || identity;
+      const onSuccess = thunk.onSuccess || config.onSuccess || onJsonApiResponse;
+      const onFailure = thunk.onFailure || config.onFailure || onJsonApiError;
 
       dispatch(actionObject);
 
