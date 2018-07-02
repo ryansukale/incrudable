@@ -32,7 +32,7 @@ Incrudable attempts to solve this problem of writing boilerplate code by providi
 #### redux-thunks
 
 ```js
-// modules/songs/resources.js
+// File: modules/songs/resources.js
 import incrudable from 'incrudable/lib/redux-thunk';
 
 // Define the configuration for your resources as follows
@@ -51,10 +51,12 @@ const resources = {
 ```
 
 ```js
-/modules/thunks/songs.js
-export * from incrudable(resources);
+// File: /modules/thunks/songs.js
+import incrudable from 'incrudable/lib/redux-thunks';
+export thunks from incrudable.fromResource(resources.songs);
+export default thunks;
 
-/** This returns an object with the following properties
+/** This returns an object with the following properties corresponding to crud operations
 {
   create: f(), // Thunks
   read: f(),
@@ -67,16 +69,15 @@ export * from incrudable(resources);
 
 ```js
 // From within your react component
-// components/songs/Create.jsx
-import {albums} from 'modules/albums/resources';
+// File: components/songs/Create.jsx
+import {songs} from 'modules/thunks/songs';
 
 const payload = {body: {title: 'Elements of Life', genre: 'trance'}};
-dispatch(albums.create(payload));
+dispatch(songs.create(payload));
 
-// ---------
-// components/songs/ListSongs.jsx
+// File: components/songs/ListSongs.jsx
 const payload = {query: {page: 10}};
-dispatch(albums.list(payload));
+dispatch(songs.list(payload));
 
 ```
 
@@ -93,7 +94,6 @@ function songssReducer(state, {action, payload}) {
     case songs.create.wait:
       return {isLoading: true};
 
-    // Handle your custom action group
     case songs.list.success:
       return {...};
     case songs.list.error:
