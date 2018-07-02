@@ -1,11 +1,12 @@
 /* global describe, it, beforeEach */
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import fromResource from '../../src/redux-observable/fromResource';
+const errorUtil = () => throwError('error');
 
-function createMockAjax() {
+function createMockSuccessAjax() {
   return {
     postJSON: sinon
       .stub()
@@ -17,6 +18,15 @@ function createMockAjax() {
       .stub()
       .returns(Promise.resolve({ message: 'test putJSON ' })),
     delJSON: sinon.stub().returns(Promise.resolve({ message: 'test delJSON ' }))
+  };
+}
+
+function createMockFailureAjax() {
+  return {
+    postJSON: sinon.spy(errorUtil),
+    getJSON: sinon.spy(errorUtil),
+    putJSON: sinon.spy(errorUtil),
+    delJSON: sinon.spy(errorUtil)
   };
 }
 
@@ -34,7 +44,7 @@ const resource = {
 
 describe('redux-observable: fromResource', () => {
   beforeEach(() => {
-    config.ajax = createMockAjax();
+    config.ajax = createMockSuccessAjax();
   });
 
   function testCustomBeforeSubmit(operation, done) {
@@ -44,9 +54,26 @@ describe('redux-observable: fromResource', () => {
     const action$ = of(tasks[operation](request));
 
     tasks[operation].beforeSubmit = sinon.spy(request => of(customRequest));
-    
+
     tasks[operation].epic(action$).subscribe(({ payload }) => {
       expect(payload.request).to.deep.equal(customRequest);
+      done();
+    });
+  }
+
+  function testCustomOnFailure(operation, done) {
+    const tasks = fromResource(resource, {ajax: createMockFailureAjax()});
+    const request = { body: 'hello', params: { id: 10, songId: 20 } };
+    const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+    const action$ = of(tasks[operation](request));
+
+    tasks[operation].onFailure = sinon.spy(({ payload }) => ({
+      type: 'CUSTOM_FAILURE',
+      payload
+    }));
+    
+    tasks[operation].epic(action$).subscribe(({ payload }) => {
+      expect(tasks[operation].onFailure.calledOnce).to.equal(true);
       done();
     });
   }
@@ -70,6 +97,10 @@ describe('redux-observable: fromResource', () => {
     it('allows a custom beforeSubmit', done => {
       testCustomBeforeSubmit('create', done);
     });
+
+    it('allows a custom onFailure', done => {
+      testCustomOnFailure('create', done);
+    });
   });
 
   describe('read operation', done => {
@@ -90,6 +121,10 @@ describe('redux-observable: fromResource', () => {
 
     it('allows a custom beforeSubmit', done => {
       testCustomBeforeSubmit('read', done);
+    });
+
+    it('allows a custom onFailure', done => {
+      testCustomOnFailure('read', done);
     });
   });
 
@@ -112,6 +147,10 @@ describe('redux-observable: fromResource', () => {
     it('allows a custom beforeSubmit', done => {
       testCustomBeforeSubmit('update', done);
     });
+
+    it('allows a custom onFailure', done => {
+      testCustomOnFailure('update', done);
+    });
   });
 
   describe('del operation', done => {
@@ -131,6 +170,10 @@ describe('redux-observable: fromResource', () => {
 
       it('allows a custom beforeSubmit', done => {
         testCustomBeforeSubmit('del', done);
+      });
+
+      it('allows a custom onFailure', done => {
+        testCustomOnFailure('del', done);
       });
     });
   });
@@ -153,6 +196,10 @@ describe('redux-observable: fromResource', () => {
 
     it('allows a custom beforeSubmit', done => {
       testCustomBeforeSubmit('list', done);
+    });
+
+    it('allows a custom onFailure', done => {
+      testCustomOnFailure('list', done);
     });
   });
 });

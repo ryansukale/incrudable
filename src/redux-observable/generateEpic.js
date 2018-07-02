@@ -22,8 +22,6 @@ function onJsonApiError({ actions }, request, response) {
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
-  // const {actions} = config;
-
   function task(request) {
     return actions.wait(request);
   }
@@ -32,7 +30,6 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
     url,
     actions,
     onSuccess = onJsonApiResponse,
-    onFailure = onJsonApiError
   } = config;
 
   function submit(request) {
@@ -40,7 +37,7 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
       params: request.params,
       query: request.query
     });
-
+    const onFailure = task.onFailure || config.onFailure || onJsonApiError; 
     const handlerConfig = { actions, onFailure };
 
     return from(ajax[ajaxMethodName](path, request)).pipe(
