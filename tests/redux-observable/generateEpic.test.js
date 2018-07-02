@@ -146,7 +146,7 @@ describe('generateEpic', () => {
         url: '/albums'
       };
       const request = { body: 'hello' };
-      const response = { body: 'Test error' };
+      const response = { errors: 'Test error' };
       const ajax = { putJSON: () => Promise.reject(response) };
       const operation = getTask(options, ajax);
       const { epic } = operation;

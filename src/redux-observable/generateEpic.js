@@ -3,22 +3,10 @@ import { map, filter, switchMap, catchError } from 'rxjs/operators';
 import createUrl from 'batarang/createUrl';
 
 import ajaxObservable from './ajaxObservable';
+import { onJsonApiResponse, onJsonApiError } from './handlers';
 
 function identityStream(data) {
   return of(data);
-}
-
-function onJsonApiResponse({ actions, onFailure }, request, response) {
-  if (response.errors) {
-    return onFailure({ actions }, request, response);
-  }
-  const payload = { request, response };
-  return actions.success(payload);
-}
-
-function onJsonApiError({ actions }, request, response) {
-  const payload = { request, errors: response.errors };
-  return actions.failure(payload);
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
