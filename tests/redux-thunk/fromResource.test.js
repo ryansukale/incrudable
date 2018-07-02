@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import fromResource from '../../src/redux-thunk/fromResource';
+
 const errorUtil = message => () => Promise.reject(`error ${message}`);
 const successUtil = message => () => Promise.resolve(`test ${message}`);
 
@@ -39,43 +40,41 @@ const resource = {
 function testCustomBeforeSubmit(operation) {
   const tasks = fromResource(resource, config);
   const request = { body: 'hello', params: { id: 10, songId: 20 } };
-  const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+  const customRequest = {
+    body: 'hello',
+    params: { id: 'custom_id', songId: 'custom_songId' }
+  };
   const dispatch = sinon.spy();
 
   tasks[operation].beforeSubmit = sinon.spy(() => customRequest);
 
-  return tasks[operation](request)(dispatch)
-    .then(() => {
-      expect(tasks[operation].beforeSubmit.calledOnce).to.equal(true);
-    });
+  return tasks[operation](request)(dispatch).then(() => {
+    expect(tasks[operation].beforeSubmit.calledOnce).to.equal(true);
+  });
 }
 
 function testCustomOnFailure(operation) {
-  const tasks = fromResource(resource, { ajax: createSpyFailureAjax()});
+  const tasks = fromResource(resource, { ajax: createSpyFailureAjax() });
   const request = { body: 'hello', params: { id: 10, songId: 20 } };
-  const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
   const dispatch = sinon.spy();
 
   tasks[operation].onFailure = sinon.spy();
 
-  return tasks[operation](request)(dispatch)
-    .then(() => {
-      expect(tasks[operation].onFailure.calledOnce).to.equal(true);
-    });
+  return tasks[operation](request)(dispatch).then(() => {
+    expect(tasks[operation].onFailure.calledOnce).to.equal(true);
+  });
 }
 
 function testCustomOnSuccess(operation) {
   const tasks = fromResource(resource, config);
   const request = { body: 'hello', params: { id: 10, songId: 20 } };
-  const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
   const dispatch = sinon.spy();
 
   tasks[operation].onSuccess = sinon.spy();
 
-  return tasks[operation](request)(dispatch)
-    .then(() => {
-      expect(tasks[operation].onSuccess.calledOnce).to.equal(true);
-    });
+  return tasks[operation](request)(dispatch).then(() => {
+    expect(tasks[operation].onSuccess.calledOnce).to.equal(true);
+  });
 }
 
 describe('redux-thunk: fromResource', () => {

@@ -10,14 +10,11 @@ function identityStream(data) {
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
+  const { url, actions } = config;
+
   function task(request) {
     return actions.wait(request);
   }
-
-  const {
-    url,
-    actions,
-  } = config;
 
   function submit(request) {
     const path = createUrl(url, {
@@ -38,7 +35,8 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
     return action$.pipe(
       filter(actions.wait),
       switchMap(({ payload }) => {
-        const beforeSubmit = task.beforeSubmit || config.beforeSubmit || identityStream;
+        const beforeSubmit =
+          task.beforeSubmit || config.beforeSubmit || identityStream;
         return beforeSubmit(payload);
       }),
       switchMap(submit)

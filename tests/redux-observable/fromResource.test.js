@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import { of, throwError } from 'rxjs';
 
 import fromResource from '../../src/redux-observable/fromResource';
+
 const errorUtil = message => () => throwError(`error ${message}`);
 const successUtil = message => () => of({ message: `test ${message}` });
 
@@ -45,7 +46,10 @@ describe('redux-observable: fromResource', () => {
   function testCustomBeforeSubmit(operation, done) {
     const tasks = fromResource(resource, config);
     const request = { body: 'hello', params: { id: 10, songId: 20 } };
-    const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+    const customRequest = {
+      body: 'hello',
+      params: { id: 'custom_id', songId: 'custom_songId' }
+    };
     const action$ = of(tasks[operation](request));
 
     tasks[operation].beforeSubmit = sinon.spy(() => of(customRequest));
@@ -57,17 +61,16 @@ describe('redux-observable: fromResource', () => {
   }
 
   function testCustomOnFailure(operation, done) {
-    const tasks = fromResource(resource, {ajax: createSpyFailureAjax()});
+    const tasks = fromResource(resource, { ajax: createSpyFailureAjax() });
     const request = { body: 'hello', params: { id: 10, songId: 20 } };
-    const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
     const action$ = of(tasks[operation](request));
 
     tasks[operation].onFailure = sinon.spy(({ payload }) => ({
       type: 'CUSTOM_FAILURE',
       payload
     }));
-    
-    tasks[operation].epic(action$).subscribe(({ payload }) => {
+
+    tasks[operation].epic(action$).subscribe(() => {
       expect(tasks[operation].onFailure.calledOnce).to.equal(true);
       done();
     });
@@ -76,21 +79,20 @@ describe('redux-observable: fromResource', () => {
   function testCustomOnSuccess(operation, done) {
     const tasks = fromResource(resource, config);
     const request = { body: 'hello', params: { id: 10, songId: 20 } };
-    const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
     const action$ = of(tasks[operation](request));
 
     tasks[operation].onSuccess = sinon.spy(({ payload }) => ({
       type: 'CUSTOM_SUCCESS',
       payload
     }));
-    
-    tasks[operation].epic(action$).subscribe(({ payload }) => {
+
+    tasks[operation].epic(action$).subscribe(() => {
       expect(tasks[operation].onSuccess.calledOnce).to.equal(true);
       done();
     });
   }
 
-  describe('create operation', done => {
+  describe('create operation', () => {
     it('generates a CREATE epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { body: 'hello', params: { id: 10 } };
@@ -119,7 +121,7 @@ describe('redux-observable: fromResource', () => {
     });
   });
 
-  describe('read operation', done => {
+  describe('read operation', () => {
     it('generates a READ epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { params: { id: 10, songId: 20 } };
@@ -148,7 +150,7 @@ describe('redux-observable: fromResource', () => {
     });
   });
 
-  describe('update operation', done => {
+  describe('update operation', () => {
     it('generates a UPDATE epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { body: 'hello', params: { id: 10, songId: 20 } };
@@ -177,7 +179,7 @@ describe('redux-observable: fromResource', () => {
     });
   });
 
-  describe('del operation', done => {
+  describe('del operation', () => {
     it('generates a DEL epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { params: { id: 10, songId: 20 } };
@@ -206,7 +208,7 @@ describe('redux-observable: fromResource', () => {
     });
   });
 
-  describe('del operation', done => {
+  describe('del operation', () => {
     it('generates a LIST epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { params: { id: 10 } };

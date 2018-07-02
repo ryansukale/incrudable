@@ -1,8 +1,11 @@
-/* global describe, it, beforeEach, afterEach */
+/* global describe, it */
 import { expect } from 'chai';
 import sinon from 'sinon';
 
-import { onJsonApiResponse, onJsonApiError } from '../../src/redux-observable/handlers';
+import {
+  onJsonApiResponse,
+  onJsonApiError
+} from '../../src/redux-observable/handlers';
 
 function getHandlerConfigSpies() {
   return {
@@ -14,7 +17,7 @@ function getHandlerConfigSpies() {
   };
 }
 
-const request = { params: {id: 10}};
+const request = { params: { id: 10 } };
 
 describe('redux-observable response handlers', () => {
   describe('onJsonApiResponse', () => {

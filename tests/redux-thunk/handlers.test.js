@@ -1,8 +1,11 @@
-/* global describe, it, beforeEach, afterEach */
+/* global describe, it */
 import { expect } from 'chai';
 import sinon from 'sinon';
 
-import { onJsonApiResponse, onJsonApiError } from '../../src/redux-thunk/handlers';
+import {
+  onJsonApiResponse,
+  onJsonApiError
+} from '../../src/redux-thunk/handlers';
 
 function getHandlerConfigSpies() {
   return {
@@ -16,7 +19,7 @@ function getHandlerConfigSpies() {
   };
 }
 
-const request = { params: {id: 10}};
+const request = { params: { id: 10 } };
 
 describe('redux-thunk response handlers', () => {
   describe('onJsonApiResponse', () => {
