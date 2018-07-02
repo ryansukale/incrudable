@@ -1,30 +1,57 @@
 incrudable
 ----
 
-Wait for it...
+Automagically generate thunks or epics for your applications CRUD routes.
 
+#### Philosophy
+Assume you have crud resource that supported the following operations.
 ```js
-// modules/albums/resources.js
-// If you are using redux-thunk
-import incrudable from 'incrudable/redux-thunk';
-
-// If you are using redux-observable
-// import incrudable from 'incrudable/redux-observable';
-
-// Define the configuration for your resources as follows
 const resources = {
-  albums: {
-    name: 'albums',
+  songs: {
+    name: 'songs',
     operations: {
-      create: '/api/albums',
-      read: '/api/albums/:id'
-      update: '/api/albums/:id',
-      del: '/api/albums/:id',
-      list: '/api/albums'
+      create: '/api/albums/:id/songs',
+      read: '/api/albums/:id/songs/:songId'
+      update: '/api/albums/:id/songs/:songId',
+      del: '/api/albums/:id/songs/:songId',
+      list: '/api/albums/:id/songs'
     }
   }
 };
+```
+Lets take the first operation `create`. When a user interacts with the UI to create a song, ideally, within your application, there are 3 meaningful events that a store can handle in the below sequence
 
+- 1 - Loading/Waiting - just before the request is made
+- 2 - Success - when a successful response is received
+- 3 - Failure - when an error occurs
+
+This implies that for the `create` operation, your application needs to dispatch 3 actions in a sequence. This same logic applies to all the operations of the song resource. As well as all the other resources within your application.
+
+Incrudable attempts to solve this problem of writing boilerplate code by providing you with thunk and epic generators that enable this sequence of dispatch events. At the time of writing this library exposes two implementations of generators using `redux-thunks` and `redux-observable`.
+
+#### redux-thunks
+
+```js
+// modules/songs/resources.js
+import incrudable from 'incrudable/lib/redux-thunk';
+
+// Define the configuration for your resources as follows
+const resources = {
+  songs: {
+    name: 'songs',
+    operations: {
+      create: '/api/albums/:id/songs',
+      read: '/api/albums/:id/songs/:songId'
+      update: '/api/albums/:id/songs/:songId',
+      del: '/api/albums/:id/songs/:songId',
+      list: '/api/albums/:id/songs'
+    }
+  }
+};
+```
+
+```js
+/modules/thunks/songs.js
 export * from incrudable(resources);
 
 /** This returns an object with the following properties
@@ -36,30 +63,49 @@ export * from incrudable(resources);
   list: f()
 }
 */
+```
 
-// You can use redux to dispatch
-
-import {albums} from 'modules/albums/resources'
-
-// ---------
+```js
+// From within your react component
+// components/songs/Create.jsx
+import {albums} from 'modules/albums/resources';
 
 const payload = {body: {title: 'Elements of Life', genre: 'trance'}};
-dispatch(
-  albums.create(payload, {actions: actions.create})
-);
+dispatch(albums.create(payload));
 
 // ---------
-
+// components/songs/ListSongs.jsx
 const payload = {query: {page: 10}};
-dispatch(
-  albums.list(payload, {actions: actions.list})
-);
+dispatch(albums.list(payload));
 
 ```
 
+```js
+// reducers/modules/songs.js
+import {songs} from './thunks/create';
+
+function songssReducer(state, {action, payload}) {
+  switch (action) {
+    case songs.create.success:
+      return {latest: payload};
+    case songs.create.error:
+      return {errors: payload};
+    case songs.create.wait:
+      return {isLoading: true};
+
+    // Handle your custom action group
+    case songs.list.success:
+      return {...};
+    case songs.list.error:
+      return {...};
+    case songs.list.wait:
+      return {...};
+  }
+}
+
 ---
 
-You can reuse thunks and export custom actions. This comes in handy when you want to use perform the operation of a thunk like fetching a list of things when filtering, sorting, etc but want to dispatch custom actions based on business your business logic / query criteria.
+You can reuse thunks and export custom actions. This comes in handy when you want to perform the operation of a thunk like fetching a list of things when filtering, sorting, etc but want to dispatch custom actions based on business your business logic / query criteria.
 
 ```js
 // modules/albums/filter.js
@@ -105,6 +151,11 @@ function albumsReducer(state, {action, payload}) {
 ```
 
 ---
+
+
+
+// If you are using redux-observable
+// import incrudable from 'incrudable/lib/redux-observable';
 
 #### incrudable
 
