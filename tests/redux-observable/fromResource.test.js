@@ -37,94 +37,122 @@ describe('redux-observable: fromResource', () => {
     config.ajax = createMockAjax();
   });
 
-  it('generates a CREATE epic for a resource with actions', done => {
+  function testCustomBeforeSubmit(operation, done) {
     const tasks = fromResource(resource, config);
-    const request = { body: 'hello', params: { id: 10 } };
-    const action$ = of(tasks.create(request));
+    const request = { body: 'hello', params: { id: 10, songId: 20 } };
+    const customRequest = {body: 'hello', params: {id: 'custom_id', songId: 'custom_songId'}};
+    const action$ = of(tasks[operation](request));
 
-    tasks.create.epic(action$).subscribe(({ payload }) => {
-      expect(payload).to.deep.equal({
-        request,
-        response: { message: 'test postJSON ' }
-      });
-      expect(config.ajax.postJSON.args[0][0]).to.equal('/albums/10/songs');
-      done();
-    });
-  });
-
-  it('allows adding an beforeSubmit after task has been created', done => {
-    const tasks = fromResource(resource, config);
-    const request = { body: 'hello', params: { id: 10 } };
-    const action$ = of(tasks.create(request));
-    const customRequest = {body: 'hello', params: {id: 'custom'}};
-
-    tasks.create.beforeSubmit = sinon.spy(request => {
-      return of(customRequest);
-    });
-
-    tasks.create.epic(action$).subscribe(({ payload }) => {
+    tasks[operation].beforeSubmit = sinon.spy(request => of(customRequest));
+    
+    tasks[operation].epic(action$).subscribe(({ payload }) => {
       expect(payload.request).to.deep.equal(customRequest);
       done();
     });
-  });
+  }
 
-  it('generates a READ epic for a resource with actions', done => {
-    const tasks = fromResource(resource, config);
-    const request = { params: { id: 10, songId: 20 } };
-    const action$ = of(tasks.create(request));
+  describe('create operation', done => {
+    it('generates a CREATE epic for a resource with actions', done => {
+      const tasks = fromResource(resource, config);
+      const request = { body: 'hello', params: { id: 10 } };
+      const action$ = of(tasks.create(request));
 
-    tasks.read.epic(action$).subscribe(({ payload }) => {
-      expect(payload).to.deep.equal({
-        request,
-        response: { message: 'test getJSON ' }
+      tasks.create.epic(action$).subscribe(({ payload }) => {
+        expect(payload).to.deep.equal({
+          request,
+          response: { message: 'test postJSON ' }
+        });
+        expect(config.ajax.postJSON.args[0][0]).to.equal('/albums/10/songs');
+        done();
       });
-      expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs/20');
-      done();
+    });
+
+    it('allows a custom beforeSubmit', done => {
+      testCustomBeforeSubmit('create', done);
     });
   });
 
-  it('generates a UPDATE epic for a resource with actions', done => {
-    const tasks = fromResource(resource, config);
-    const request = { body: 'hello', params: { id: 10, songId: 20 } };
-    const action$ = of(tasks.create(request));
+  describe('read operation', done => {
+    it('generates a READ epic for a resource with actions', done => {
+      const tasks = fromResource(resource, config);
+      const request = { params: { id: 10, songId: 20 } };
+      const action$ = of(tasks.create(request));
 
-    tasks.update.epic(action$).subscribe(({ payload }) => {
-      expect(payload).to.deep.equal({
-        request,
-        response: { message: 'test putJSON ' }
+      tasks.read.epic(action$).subscribe(({ payload }) => {
+        expect(payload).to.deep.equal({
+          request,
+          response: { message: 'test getJSON ' }
+        });
+        expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs/20');
+        done();
       });
-      expect(config.ajax.putJSON.args[0][0]).to.equal('/albums/10/songs/20');
-      done();
+    });
+
+    it('allows a custom beforeSubmit', done => {
+      testCustomBeforeSubmit('read', done);
     });
   });
 
-  it('generates a DEL epic for a resource with actions', done => {
-    const tasks = fromResource(resource, config);
-    const request = { params: { id: 10, songId: 20 } };
-    const action$ = of(tasks.create(request));
+  describe('update operation', done => {
+    it('generates a UPDATE epic for a resource with actions', done => {
+      const tasks = fromResource(resource, config);
+      const request = { body: 'hello', params: { id: 10, songId: 20 } };
+      const action$ = of(tasks.create(request));
 
-    tasks.del.epic(action$).subscribe(({ payload }) => {
-      expect(payload).to.deep.equal({
-        request,
-        response: { message: 'test delJSON ' }
+      tasks.update.epic(action$).subscribe(({ payload }) => {
+        expect(payload).to.deep.equal({
+          request,
+          response: { message: 'test putJSON ' }
+        });
+        expect(config.ajax.putJSON.args[0][0]).to.equal('/albums/10/songs/20');
+        done();
       });
-      expect(config.ajax.delJSON.args[0][0]).to.equal('/albums/10/songs/20');
-      done();
+    });
+
+    it('allows a custom beforeSubmit', done => {
+      testCustomBeforeSubmit('update', done);
     });
   });
 
-  it('generates a LIST epic for a resource with actions', done => {
-    const tasks = fromResource(resource, config);
-    const request = { params: { id: 10 } };
-    const action$ = of(tasks.create(request));
+  describe('del operation', done => {
+    it('generates a DEL epic for a resource with actions', done => {
+      const tasks = fromResource(resource, config);
+      const request = { params: { id: 10, songId: 20 } };
+      const action$ = of(tasks.create(request));
 
-    tasks.list.epic(action$).subscribe(({ payload }) => {
-      expect(payload).to.deep.equal({
-        request,
-        response: { message: 'test getJSON ' }
+      tasks.del.epic(action$).subscribe(({ payload }) => {
+        expect(payload).to.deep.equal({
+          request,
+          response: { message: 'test delJSON ' }
+        });
+        expect(config.ajax.delJSON.args[0][0]).to.equal('/albums/10/songs/20');
+        done();
       });
-      expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs');
-      done();
+
+      it('allows a custom beforeSubmit', done => {
+        testCustomBeforeSubmit('del', done);
+      });
+    });
+  });
+
+  describe('del operation', done => {
+    it('generates a LIST epic for a resource with actions', done => {
+      const tasks = fromResource(resource, config);
+      const request = { params: { id: 10 } };
+      const action$ = of(tasks.create(request));
+
+      tasks.list.epic(action$).subscribe(({ payload }) => {
+        expect(payload).to.deep.equal({
+          request,
+          response: { message: 'test getJSON ' }
+        });
+        expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs');
+        done();
+      });
+    });
+
+    it('allows a custom beforeSubmit', done => {
+      testCustomBeforeSubmit('list', done);
     });
   });
 });
