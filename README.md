@@ -52,8 +52,8 @@ const resources = {
 
 ```js
 // File: /modules/thunks/songs.js
-import incrudable from 'incrudable/lib/redux-thunks';
-export thunks from incrudable.fromResource(resources.songs);
+import fromResource from 'incrudable/lib/redux-thunks/fromResource';
+const thunks = fromResource(resources.songs);
 export default thunks;
 
 /** This returns an object with the following properties corresponding to crud operations
@@ -85,6 +85,7 @@ dispatch(songs.list(payload));
 // reducers/modules/songs.js
 import {songs} from './thunks/create';
 
+// Your reducer now automatically has access to three events
 function songssReducer(state, {action, payload}) {
   switch (action) {
     case songs.create.success:
