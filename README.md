@@ -90,14 +90,14 @@ function songssReducer(state, {action, payload}) {
   switch (action) {
     case songs.create.success:
       return {latest: payload};
-    case songs.create.error:
+    case songs.create.failure:
       return {errors: payload};
     case songs.create.wait:
       return {isLoading: true};
 
     case songs.list.success:
       return {...};
-    case songs.list.error:
+    case songs.list.failure:
       return {...};
     case songs.list.wait:
       return {...};
@@ -144,7 +144,7 @@ function albumsReducer(state, {action, payload}) {
     // Custom action handlers
     case songActions.filter.success:
       return {by_genre: payload};
-    case songActionsfilter.error:
+    case songActionsfilter.failure:
       return {errors: payload};
     case songActions.filter.wait:
       return {isFiltering: true};
