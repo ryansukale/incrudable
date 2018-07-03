@@ -92,7 +92,7 @@ export default function generateEpic(
       );
     }
 
-    throw new Error(`invalid HTTP method ${method} for ${operation}`);
+    throw new Error(`invalid HTTP method ${method} for ${operation} operation`);
   }
 
   deps.ajax = deps.ajax || ajaxObservable(deps.getHeaders);

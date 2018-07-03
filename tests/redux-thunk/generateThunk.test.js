@@ -22,7 +22,9 @@ describe('generateThunk', () => {
       };
       const config = { ajax: createAjaxPromiseSuccessSpies() };
       const dispatch = sinon.spy();
-      const thunk = generateThunk(options, config)({ query: { genre: 'rock' } });
+      const thunk = generateThunk(options, config)({
+        query: { genre: 'rock' }
+      });
 
       return thunk(dispatch).then(() => {
         expect(options.actions.wait.calledOnce).to.equal(true);
@@ -30,7 +32,9 @@ describe('generateThunk', () => {
         expect(dispatch.calledTwice).to.equal(true);
 
         expect(config.ajax.getJSON.calledOnce);
-        expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums?genre=rock');
+        expect(config.ajax.getJSON.firstCall.args[0]).to.equal(
+          '/albums?genre=rock'
+        );
       });
     });
   });

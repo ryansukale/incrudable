@@ -66,6 +66,8 @@ const methodGeneratorMapping = {
 };
 
 function getGenerator(operation, method) {
+  // Console.log('operation', operation);
+  // console.log('method', method);
   if (method) {
     return methodGeneratorMapping[method.toLowerCase()];
   }
@@ -78,15 +80,16 @@ export default function generateThunk(
   deps = {}
 ) {
   const generator = getGenerator(operation, method);
+  // Console.log('generator', generator);
 
   if (!generator) {
-    if (!method) {
-      throw new Error(
-        `default operations should be one of ${Object.keys(
-          thunkGenerators
-        )}. Received: ${operation}. Add a 'method' attribute for this custom operation.`
-      );
-    }
+    // If (!method) {
+    //   throw new Error(
+    //     `default operations should be one of ${Object.keys(
+    //       thunkGenerators
+    //     )}. Received: ${operation}. Add a 'method' attribute for this custom operation.`
+    //   );
+    // }
 
     throw new Error(`invalid HTTP method ${method} for ${operation}`);
   }

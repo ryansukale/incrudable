@@ -35,7 +35,7 @@ function assertThunkInterface(tasks, opName, actionGroups) {
   expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
 }
 
-describe('getTasks', () => {
+describe.only('getTasks', () => {
   describe('redux-thunk tasks', () => {
     it('creates tasks based on generateThunk', () => {
       const { songs } = resources;
@@ -44,7 +44,9 @@ describe('getTasks', () => {
       const actionGroups = getActionGroups(songs, songs.operations);
       const tasks = getTasks(generatorSpy, songs, actionGroups);
 
-      Object.keys(songs.operations).map(opName => assertThunkInterface(tasks, opName, actionGroups));
+      Object.keys(songs.operations).map(opName =>
+        assertThunkInterface(tasks, opName, actionGroups)
+      );
     });
 
     it('invokes generateThunk with the custom actions', () => {

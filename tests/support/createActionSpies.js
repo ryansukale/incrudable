@@ -1,5 +1,5 @@
-import createActionGroup from '../../src/createActionGroup';
 import sinon from 'sinon';
+import createActionGroup from '../../src/createActionGroup';
 
 export default function createActionSpies(base) {
   const actions = createActionGroup(base);
