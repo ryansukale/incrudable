@@ -58,18 +58,37 @@ const thunkGenerators = {
   list
 };
 
+const methodGeneratorMapping = {
+  post: thunkGenerators.create,
+  get: thunkGenerators.read,
+  put: thunkGenerators.update,
+  delete: thunkGenerators.del
+};
+
+function getGenerator(operation, method) {
+  if (method) {
+    return methodGeneratorMapping[method.toLowerCase()];
+  }
+
+  return thunkGenerators[operation.toLowerCase()];
+}
+
 export default function generateThunk(
-  { operation, actions, onSuccess, onFailure, beforeSubmit, url },
+  { operation, actions, onSuccess, onFailure, beforeSubmit, url, method },
   deps = {}
 ) {
-  const operationName = operation.toLowerCase();
-  const generator = thunkGenerators[operationName];
+  const generator = getGenerator(operation, method);
+
   if (!generator) {
-    throw new Error(
-      `operation should be one of ${Object.keys(
-        thunkGenerators
-      )}. Received: ${operation}`
-    );
+    if (!method) {
+      throw new Error(
+        `default operations should be one of ${Object.keys(
+          thunkGenerators
+        )}. Received: ${operation}`
+      );
+    }
+
+    throw new Error(`invalid HTTP method ${method} for ${operation}`);
   }
 
   deps.ajax = deps.ajax || ajaxPromise(deps.getHeaders);
