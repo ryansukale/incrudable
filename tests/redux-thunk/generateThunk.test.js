@@ -7,32 +7,41 @@ import generateThunk, {
 } from '../../src/redux-thunk/generateThunk';
 import createActionGroup from '../../src/createActionGroup';
 
-function createActions(base) {
-  const actions = createActionGroup(base);
-  sinon.spy(actions, 'wait');
-  sinon.spy(actions, 'success');
-  sinon.spy(actions, 'failure');
-
-  return actions;
-}
-
-function createMockAjax() {
-  return {
-    postJSON: sinon.stub().returns(Promise.resolve('postJSON')),
-    getJSON: sinon.stub().returns(Promise.resolve('getJSON')),
-    putJSON: sinon.stub().returns(Promise.resolve('putJSON')),
-    delJSON: sinon.stub().returns(Promise.resolve('delJSON'))
-  };
-}
+// Testing utils
+import createActionSpies from '../support/createActionSpies';
+import createAjaxPromiseSuccessSpies from '../support/createAjaxPromiseSuccessSpies';
 
 describe('generateThunk', () => {
+  describe('custom operation', () => {
+    it('generates thunk for a custom `filteredList` operation', () => {
+      const options = {
+        operation: 'filteredList',
+        actions: createActionSpies('FILTERED_ALBUMS'),
+        url: '/albums',
+        method: 'GET'
+      };
+      const config = { ajax: createAjaxPromiseSuccessSpies() };
+      const dispatch = sinon.spy();
+      const thunk = generateThunk(options, config)({ query: { genre: 'rock' } });
+
+      return thunk(dispatch).then(() => {
+        expect(options.actions.wait.calledOnce).to.equal(true);
+        expect(options.actions.success.calledOnce).to.equal(true);
+        expect(dispatch.calledTwice).to.equal(true);
+
+        expect(config.ajax.getJSON.calledOnce);
+        expect(config.ajax.getJSON.firstCall.args[0]).to.equal('/albums?genre=rock');
+      });
+    });
+  });
+
   it('generates thunk for `create` operation that dispatches all the actions', () => {
     const options = {
       operation: 'create',
-      actions: createActions('CREATE_ALBUMS'),
+      actions: createActionSpies('CREATE_ALBUMS'),
       url: '/albums'
     };
-    const config = { ajax: createMockAjax() };
+    const config = { ajax: createAjaxPromiseSuccessSpies() };
     const dispatch = sinon.spy();
     const thunk = generateThunk(options, config)({ body: 'hello' });
 
@@ -49,10 +58,10 @@ describe('generateThunk', () => {
   it('generates thunk for `read` operation that dispatches all the actions', () => {
     const options = {
       operation: 'read',
-      actions: createActions('READ_ALBUMS'),
+      actions: createActionSpies('READ_ALBUMS'),
       url: '/albums/:id'
     };
-    const config = { ajax: createMockAjax() };
+    const config = { ajax: createAjaxPromiseSuccessSpies() };
     const dispatch = sinon.spy();
     const thunk = generateThunk(options, config)({ params: { id: '10' } });
 
@@ -69,10 +78,10 @@ describe('generateThunk', () => {
   it('generates thunk for `update` operation that dispatches all the actions', () => {
     const options = {
       operation: 'update',
-      actions: createActions('UPDATE_ALBUMS'),
+      actions: createActionSpies('UPDATE_ALBUMS'),
       url: '/albums/:id'
     };
-    const config = { ajax: createMockAjax() };
+    const config = { ajax: createAjaxPromiseSuccessSpies() };
     const dispatch = sinon.spy();
     const thunk = generateThunk(options, config)({ params: { id: '10' } });
 
@@ -89,10 +98,10 @@ describe('generateThunk', () => {
   it('generates thunk for `delete` operation that dispatches all the actions', () => {
     const options = {
       operation: 'del',
-      actions: createActions('DEL_ALBUMS'),
+      actions: createActionSpies('DEL_ALBUMS'),
       url: '/albums/:id'
     };
-    const config = { ajax: createMockAjax() };
+    const config = { ajax: createAjaxPromiseSuccessSpies() };
     const dispatch = sinon.spy();
     const thunk = generateThunk(options, config)({ params: { id: '10' } });
 
@@ -109,10 +118,10 @@ describe('generateThunk', () => {
   it('generates thunk for `list` operation that dispatches all the actions', () => {
     const options = {
       operation: 'list',
-      actions: createActions('LIST_ALBUMS'),
+      actions: createActionSpies('LIST_ALBUMS'),
       url: '/albums'
     };
-    const config = { ajax: createMockAjax() };
+    const config = { ajax: createAjaxPromiseSuccessSpies() };
     const dispatch = sinon.spy();
     const thunk = generateThunk(options, config)({ query: { sort: 'age' } });
 
@@ -131,12 +140,12 @@ describe('generateThunk', () => {
   it('invokes custom onSuccess', () => {
     const options = {
       operation: 'read',
-      actions: createActions('READ_ALBUMS'),
+      actions: createActionSpies('READ_ALBUMS'),
       url: '/albums/:id',
       onSuccess: sinon.spy()
     };
     const request = { params: { id: '10' } };
-    const config = { ajax: createMockAjax() };
+    const config = { ajax: createAjaxPromiseSuccessSpies() };
     const dispatch = sinon.spy();
     const thunk = generateThunk(options, config)(request);
 
@@ -159,7 +168,7 @@ describe('generateThunk', () => {
   it('invokes custom onFailure', () => {
     const options = {
       operation: 'read',
-      actions: createActions('READ_ALBUMS'),
+      actions: createActionSpies('READ_ALBUMS'),
       url: '/albums/:id',
       onFailure: sinon.spy()
     };
@@ -201,13 +210,13 @@ describe('generateThunk', () => {
 
       const options = {
         operation: 'read',
-        actions: createActions('READ_ALBUMS'),
+        actions: createActionSpies('READ_ALBUMS'),
         url: '/albums/:id',
         beforeSubmit
       };
       sinon.spy(options, 'beforeSubmit');
 
-      const config = { ajax: createMockAjax() };
+      const config = { ajax: createAjaxPromiseSuccessSpies() };
       const dispatch = sinon.spy();
       const thunk = getThunkCreator('getJSON', options, config)({
         params: { id: '10' }
@@ -238,13 +247,13 @@ describe('generateThunk', () => {
 
       const options = {
         operation: 'read',
-        actions: createActions('READ_ALBUMS'),
+        actions: createActionSpies('READ_ALBUMS'),
         url: '/albums/:id',
         beforeSubmit
       };
       sinon.spy(options, 'beforeSubmit');
 
-      const config = { ajax: createMockAjax() };
+      const config = { ajax: createAjaxPromiseSuccessSpies() };
       const dispatch = sinon.spy();
       const thunk = getThunkCreator('getJSON', options, config)({
         params: { id: '10' }

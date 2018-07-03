@@ -1,5 +1,5 @@
 export default function getTasks(taskGenerator, resource, actionGroups, deps) {
-  return Object.keys(actionGroups).reduce((acc, operation) => {
+  return Object.keys(resource.operations).reduce((acc, operation) => {
     let resourceConfig = {
       actions: actionGroups[operation]
     };
