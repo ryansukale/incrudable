@@ -52,27 +52,47 @@ const create = epicGenerator.bind(null, 'postJSON');
 const read = epicGenerator.bind(null, 'getJSON');
 const update = epicGenerator.bind(null, 'putJSON');
 const del = epicGenerator.bind(null, 'delJSON');
+const list = read;
 
 const epicGenerators = {
   create,
   read,
   update,
   del,
-  list: read
+  list
 };
 
+const methodGeneratorMapping = {
+  post: epicGenerator.create,
+  get: epicGenerator.read,
+  put: epicGenerator.update,
+  delete: epicGenerator.del
+};
+
+function getGenerator(operation, method) {
+  if (method) {
+    return methodGeneratorMapping[method.toLowerCase()];
+  }
+
+  return epicGenerators[operation.toLowerCase()];
+}
+
 export default function generateEpic(
-  { operation, actions, onSuccess, onFailure, beforeSubmit, url },
+  { operation, actions, onSuccess, onFailure, beforeSubmit, url, method },
   deps = {}
 ) {
-  const operationName = operation.toLowerCase();
-  const generator = epicGenerators[operationName];
+  const generator = getGenerator(operation, method);
+
   if (!generator) {
-    throw new Error(
-      `operation should be one of ${Object.keys(
-        epicGenerators
-      )}. Received: ${operation}`
-    );
+    if (!method) {
+      throw new Error(
+        `default operations should be one of ${Object.keys(
+          thunkGenerators
+        )}. Received: ${operation}`
+      );
+    }
+
+    throw new Error(`invalid HTTP method ${method} for ${operation}`);
   }
 
   deps.ajax = deps.ajax || ajaxObservable(deps.getHeaders);
