@@ -88,7 +88,7 @@ export default function generateEpic(
       throw new Error(
         `default operations should be one of ${Object.keys(
           thunkGenerators
-        )}. Received: ${operation}`
+        )}. Received: ${operation}. Add a 'method' attribute for this custom operation.`
       );
     }
 

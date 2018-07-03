@@ -4,36 +4,44 @@ import sinon from 'sinon';
 
 import getTasks from '../src/getTasks';
 import getActionGroups from '../src/getActionGroups';
+import generateThunk from '../src/redux-thunk/generateThunk';
+import generateEpic from '../src/redux-observable/generateEpic';
 
 const resources = {
   songs: {
     name: 'songs',
     operations: {
-      create: '/songs/:id/songs',
-      read: '/songs/:id/songs/:song_id'
+      create: '/albums/:id/songs',
+      read: '/albums/:id/songs/:songId',
+      update: '/albums/:id/songs/:songId',
+      del: '/albums/:id/songs/:songId',
+      list: '/albums/:id/songs',
+      filteredList: {
+        method: 'GET',
+        url: '/albums/:id/songs'
+      }
     }
   }
 };
 
+function assertTaskInterface(tasks, resource, actionGroups) {
+  Object.keys(resource.operations).map(opName => {
+    expect(tasks[opName]).to.be.a('function');
+    expect(tasks[opName].success).to.equal(actionGroups[opName].success);
+    expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
+    expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
+  });
+}
+
 describe('getTasks', () => {
-  it('generates tasks using a taskGenerator resources', () => {
-    const { songs } = resources;
-    const mockGenerator = () => () => {};
-    const generatorSpy = sinon.spy(mockGenerator);
+  describe('redux-thunk tasks', () => {
+    it('creates tasks based on generateThunk', () => {
+      const { songs } = resources;
 
-    const actionGroups = getActionGroups(songs, songs.operations);
-    const tasks = getTasks(generatorSpy, songs, actionGroups);
+      const actionGroups = getActionGroups(songs, songs.operations);
+      const tasks = getTasks(generateThunk, songs, actionGroups);
 
-    expect(tasks.create).to.be.a('function');
-    expect(tasks.create.success).to.equal(actionGroups.create.success);
-    expect(tasks.create.failure).to.equal(actionGroups.create.failure);
-    expect(tasks.create.wait).to.equal(actionGroups.create.wait);
-
-    expect(tasks.read).to.be.a('function');
-    expect(tasks.read.success).to.equal(actionGroups.read.success);
-    expect(tasks.read.failure).to.equal(actionGroups.read.failure);
-    expect(tasks.read.wait).to.equal(actionGroups.read.wait);
-
-    expect(generatorSpy.getCalls().length).to.equal(2);
+      assertTaskInterface(tasks, songs, actionGroups);
+    });
   });
 });
