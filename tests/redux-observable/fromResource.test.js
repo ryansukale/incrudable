@@ -38,7 +38,7 @@ const resource = {
   }
 };
 
-describe('redux-observable: fromResource', () => {
+describe('fromResource: redux-observable', () => {
   beforeEach(() => {
     config.ajax = createSpySuccessAjax();
   });

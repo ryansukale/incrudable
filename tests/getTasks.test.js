@@ -35,7 +35,7 @@ function assertThunkInterface(tasks, opName, actionGroups) {
   expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
 }
 
-describe.only('getTasks', () => {
+describe('getTasks', () => {
   describe('redux-thunk tasks', () => {
     it('creates tasks based on generateThunk', () => {
       const { songs } = resources;

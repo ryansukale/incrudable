@@ -5,7 +5,6 @@ import sinon from 'sinon';
 import generateThunk, {
   getThunkCreator
 } from '../../src/redux-thunk/generateThunk';
-import createActionGroup from '../../src/createActionGroup';
 
 // Testing utils
 import createActionSpies from '../support/createActionSpies';

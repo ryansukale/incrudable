@@ -63,10 +63,10 @@ const epicGenerators = {
 };
 
 const methodGeneratorMapping = {
-  post: epicGenerator.create,
-  get: epicGenerator.read,
-  put: epicGenerator.update,
-  delete: epicGenerator.del
+  post: epicGenerators.create,
+  get: epicGenerators.read,
+  put: epicGenerators.update,
+  delete: epicGenerators.del
 };
 
 function getGenerator(operation, method) {
@@ -84,15 +84,7 @@ export default function generateEpic(
   const generator = getGenerator(operation, method);
 
   if (!generator) {
-    if (!method) {
-      throw new Error(
-        `default operations should be one of ${Object.keys(
-          epicGenerators
-        )}. Received: ${operation}. Add a 'method' attribute for this custom operation.`
-      );
-    }
-
-    throw new Error(`invalid HTTP method ${method} for ${operation} operation`);
+    throw new Error(`invalid HTTP method ${method} for ${operation}`);
   }
 
   deps.ajax = deps.ajax || ajaxObservable(deps.getHeaders);

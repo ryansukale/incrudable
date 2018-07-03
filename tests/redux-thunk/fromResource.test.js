@@ -77,7 +77,7 @@ function testCustomOnSuccess(operation) {
   });
 }
 
-describe('redux-thunk: fromResource', () => {
+describe('fromResource: redux-thunk', () => {
   beforeEach(() => {
     config.ajax = createSpySuccessAjax();
   });
