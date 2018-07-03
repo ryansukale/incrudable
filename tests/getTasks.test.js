@@ -1,11 +1,11 @@
 /* global describe, it */
 import { expect } from 'chai';
-import sinon from 'sinon';
+// Import sinon from 'sinon';
 
 import getTasks from '../src/getTasks';
 import getActionGroups from '../src/getActionGroups';
 import generateThunk from '../src/redux-thunk/generateThunk';
-import generateEpic from '../src/redux-observable/generateEpic';
+// Import generateEpic from '../src/redux-observable/generateEpic';
 
 const resources = {
   songs: {
@@ -30,6 +30,7 @@ function assertTaskInterface(tasks, resource, actionGroups) {
     expect(tasks[opName].success).to.equal(actionGroups[opName].success);
     expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
     expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
+    return undefined;
   });
 }
 

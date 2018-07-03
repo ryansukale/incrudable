@@ -93,8 +93,5 @@ export default function generateThunk(
 
   deps.ajax = deps.ajax || ajaxPromise(deps.getHeaders);
 
-  return generator(
-    { url, actions, onSuccess, onFailure, beforeSubmit },
-    deps
-  );
+  return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, deps);
 }

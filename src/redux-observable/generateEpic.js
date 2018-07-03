@@ -87,7 +87,7 @@ export default function generateEpic(
     if (!method) {
       throw new Error(
         `default operations should be one of ${Object.keys(
-          thunkGenerators
+          epicGenerators
         )}. Received: ${operation}. Add a 'method' attribute for this custom operation.`
       );
     }
@@ -97,8 +97,5 @@ export default function generateEpic(
 
   deps.ajax = deps.ajax || ajaxObservable(deps.getHeaders);
 
-  return generator(
-    { url, actions, onSuccess, onFailure, beforeSubmit },
-    deps
-  );
+  return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, deps);
 }
