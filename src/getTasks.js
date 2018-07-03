@@ -2,23 +2,30 @@ export default function getTasks(
   taskGenerator,
   resource,
   actionGroups,
-  config
+  deps
 ) {
   return Object.keys(actionGroups).reduce((acc, operation) => {
-    const url = resource.operations[operation];
-    const actions = actionGroups[operation];
+    let resourceConfig = {
+      actions: actionGroups[operation]
+    };
+
+    const operationConfig = resource.operations[operation];
+    if (typeof operationConfig === 'string') {
+      resourceConfig.url = operationConfig;
+    } else {
+      resourceConfig = {...resourceConfig, ...operationConfig}
+    };
 
     const task = taskGenerator(
       {
         operation,
-        actions,
-        url
+        ...resourceConfig
       },
-      config
+      deps
     );
 
-    Object.keys(actions).reduce((target, actionName) => {
-      target[actionName] = actions[actionName];
+    Object.keys(resourceConfig.actions).reduce((target, actionName) => {
+      target[actionName] = resourceConfig.actions[actionName];
       return target;
     }, task);
 

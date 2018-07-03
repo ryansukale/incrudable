@@ -60,7 +60,7 @@ const thunkGenerators = {
 
 export default function generateThunk(
   { operation, actions, onSuccess, onFailure, beforeSubmit, url },
-  config = {}
+  deps = {}
 ) {
   const operationName = operation.toLowerCase();
   const generator = thunkGenerators[operationName];
@@ -72,10 +72,10 @@ export default function generateThunk(
     );
   }
 
-  config.ajax = config.ajax || ajaxPromise(config.getHeaders);
+  deps.ajax = deps.ajax || ajaxPromise(deps.getHeaders);
 
   return generator(
     { url, actions, onSuccess, onFailure, beforeSubmit },
-    config
+    deps
   );
 }

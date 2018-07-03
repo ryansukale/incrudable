@@ -63,7 +63,7 @@ const epicGenerators = {
 
 export default function generateEpic(
   { operation, actions, onSuccess, onFailure, beforeSubmit, url },
-  config = {}
+  deps = {}
 ) {
   const operationName = operation.toLowerCase();
   const generator = epicGenerators[operationName];
@@ -75,10 +75,10 @@ export default function generateEpic(
     );
   }
 
-  config.ajax = config.ajax || ajaxObservable(config.getHeaders);
+  deps.ajax = deps.ajax || ajaxObservable(deps.getHeaders);
 
   return generator(
     { url, actions, onSuccess, onFailure, beforeSubmit },
-    config
+    deps
   );
 }
