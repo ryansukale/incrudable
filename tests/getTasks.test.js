@@ -28,14 +28,11 @@ const resources = {
   }
 };
 
-function assertThunkInterface(tasks, resource, actionGroups) {
-  Object.keys(resource.operations).map(opName => {
-    expect(tasks[opName]).to.be.a('function');
-    expect(tasks[opName].success).to.equal(actionGroups[opName].success);
-    expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
-    expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
-    return undefined;
-  });
+function assertThunkInterface(tasks, opName, actionGroups) {
+  expect(tasks[opName]).to.be.a('function');
+  expect(tasks[opName].success).to.equal(actionGroups[opName].success);
+  expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
+  expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
 }
 
 describe('getTasks', () => {
@@ -47,7 +44,7 @@ describe('getTasks', () => {
       const actionGroups = getActionGroups(songs, songs.operations);
       const tasks = getTasks(generatorSpy, songs, actionGroups);
 
-      assertThunkInterface(tasks, songs, actionGroups);
+      Object.keys(songs.operations).map(opName => assertThunkInterface(tasks, opName, actionGroups));
     });
 
     it('invokes generateThunk with the custom actions', () => {
@@ -61,9 +58,13 @@ describe('getTasks', () => {
           }
         }
       };
-      const generatorSpy = sinon.spy(generateThunk); //sinon.spy((...args) => generateThunk(...args));
+      const generatorSpy = sinon.spy(generateThunk);
       const tasks = getTasks(generatorSpy, resource, {});
+      const actionGroups = {
+        filteredList: resource.operations.filteredList.actions
+      };
 
+      assertThunkInterface(tasks, 'filteredList', actionGroups);
       expect(generatorSpy.args[0][0]).to.deep.equal({
         operation: 'filteredList',
         ...resource.operations.filteredList
