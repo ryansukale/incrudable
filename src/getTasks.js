@@ -53,6 +53,12 @@ export default function getTasks(taskGenerator, resource, actionGroups, deps) {
       };
     }
 
+    if (!resourceConfig.url) {
+      throw new Error(
+        `missing 'url' for ${resource.name}.operations.${operation}`
+      );
+    }
+
     const task = taskGenerator(
       {
         operation,

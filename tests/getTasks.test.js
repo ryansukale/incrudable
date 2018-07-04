@@ -30,27 +30,6 @@ const resources = {
   }
 };
 
-// Const resource = {
-//   name: 'songs',
-//   operations: {
-//     create: {
-//       url: '/albums/:id/songs'
-//     },
-//     read: {
-//       url: '/albums/:id/songs/:songId'
-//     },
-//     update: {
-//       url: '/albums/:id/songs/:songId'
-//     },
-//     del: {
-//       url: '/albums/:id/songs/:songId'
-//     },
-//     list: {
-//       url: '/albums/:id/songs'
-//     }
-//   }
-// };
-
 function assertThunkInterface(tasks, opName, actionGroups) {
   expect(tasks[opName]).to.be.a('function');
   expect(tasks[opName].success).to.equal(actionGroups[opName].success);
@@ -59,6 +38,14 @@ function assertThunkInterface(tasks, opName, actionGroups) {
 }
 
 describe('getTasks', () => {
+  const defaultActionGroups = {
+    create: {
+      wait: () => 'wait',
+      success: () => 'success',
+      failure: () => 'failure'
+    }
+  };
+
   function verifyGeneratorArgs(resource, defaultActionGroups, expectedArgs) {
     const generatorSpy = sinon.spy(() => ({}));
     getTasks(generatorSpy, resource, defaultActionGroups);
@@ -66,15 +53,7 @@ describe('getTasks', () => {
     expect(generatorSpy.args[0][0]).to.deep.equal(expectedArgs);
   }
 
-  describe('custom configuration for a well known operation name', () => {
-    const defaultActionGroups = {
-      create: {
-        wait: () => 'wait',
-        success: () => 'success',
-        failure: () => 'failure'
-      }
-    };
-
+  describe('custom configuration for a standard operation name', () => {
     it('invokes the generator with default parameters', () => {
       const resource = {
         name: 'songs',
@@ -158,6 +137,36 @@ describe('getTasks', () => {
         onSuccess: resource.operations.create.onSuccess,
         onFailure: resource.operations.create.onFailure,
         beforeSubmit: resource.operations.create.beforeSubmit
+      };
+
+      verifyGeneratorArgs(resource, defaultActionGroups, expectedArgs);
+    });
+  });
+
+  describe('configuration for a custom operation name', () => {
+    it('uses custom params for a non standard operation name', () => {
+      const filterSongs = {
+        method: 'GET',
+        url: '/albums/:id/songs',
+        actions: { wait: noop, success: noop, failure: noop },
+        onSuccess: () => 'onSuccess',
+        onFailure: () => 'onFailure',
+        beforeSubmit: () => 'beforeSubmit'
+      };
+
+      const resource = {
+        name: 'songs',
+        operations: { filterSongs }
+      };
+
+      const expectedArgs = {
+        method: filterSongs.method,
+        operation: 'filterSongs',
+        url: filterSongs.url,
+        actions: filterSongs.actions,
+        onSuccess: filterSongs.onSuccess,
+        onFailure: filterSongs.onFailure,
+        beforeSubmit: filterSongs.beforeSubmit
       };
 
       verifyGeneratorArgs(resource, defaultActionGroups, expectedArgs);
