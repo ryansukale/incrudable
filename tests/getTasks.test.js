@@ -8,6 +8,7 @@ import generateThunk from '../src/redux-thunk/generateThunk';
 
 // Testing utils
 import createActionSpies from './support/createActionSpies';
+const noop = () => null;
 
 // Import generateEpic from '../src/redux-observable/generateEpic';
 
@@ -28,6 +29,29 @@ const resources = {
   }
 };
 
+// const resource = {
+//   name: 'songs',
+//   operations: {
+//     create: {
+//       url: '/albums/:id/songs'
+//     },
+//     read: {
+//       url: '/albums/:id/songs/:songId'
+//     },
+//     update: {
+//       url: '/albums/:id/songs/:songId'
+//     },
+//     del: {
+//       url: '/albums/:id/songs/:songId'
+//     },
+//     list: {
+//       url: '/albums/:id/songs'
+//     }
+//   }
+// };
+
+
+
 function assertThunkInterface(tasks, opName, actionGroups) {
   expect(tasks[opName]).to.be.a('function');
   expect(tasks[opName].success).to.equal(actionGroups[opName].success);
@@ -36,6 +60,78 @@ function assertThunkInterface(tasks, opName, actionGroups) {
 }
 
 describe('getTasks', () => {
+  describe.only('custom configuration: well known operation names', () => {
+    it('invokes the generator with default parameters', () => {
+      const resource = {
+        name: 'songs',
+        operations: {
+          create: {
+            url: '/albums/:id/songs'
+          }
+        }
+      };
+
+      const actionGroups = getActionGroups(resource, resource.operations);
+      const generatorSpy = sinon.spy(() => ({}));
+      const tasks = getTasks(generatorSpy, resource, actionGroups);
+
+      expect(generatorSpy.args[0][0]).to.deep.equal({
+        method: 'post',
+        operation: 'create',
+        url: resource.operations.create.url,
+        actions: actionGroups.create
+      });
+    });
+
+    it('invokes the generator with custom actions', () => {
+      const resource = {
+        name: 'songs',
+        operations: {
+          create: {
+            url: '/albums/:id/songs',
+            actions: {wait: noop, success: noop, failure: noop}
+          }
+        }
+      };
+
+      const actionGroups = getActionGroups(resource, resource.operations);
+      const generatorSpy = sinon.spy(() => ({}));
+      const tasks = getTasks(generatorSpy, resource, actionGroups);
+
+      expect(generatorSpy.args[0][0]).to.deep.equal({
+        method: 'post',
+        operation: 'create',
+        url: resource.operations.create.url,
+        actions: resource.operations.create.actions
+      });
+    });
+
+
+    it('invokes the generator with custom method', () => {
+      const resource = {
+        name: 'songs',
+        operations: {
+          create: {
+            method: 'GET',
+            url: '/albums/:id/songs'
+          }
+        }
+      };
+
+      const actionGroups = getActionGroups(resource, resource.operations);
+      const generatorSpy = sinon.spy(() => ({}));
+      const tasks = getTasks(generatorSpy, resource, actionGroups);
+
+      expect(generatorSpy.args[0][0]).to.deep.equal({
+        method: 'GET',
+        operation: 'create',
+        url: resource.operations.create.url,
+        actions: actionGroups.create
+      });
+    });
+
+  });
+
   describe('redux-thunk tasks', () => {
     it('creates tasks based on generateThunk', () => {
       const { songs } = resources;

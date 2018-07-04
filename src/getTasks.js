@@ -45,6 +45,7 @@ export default function getTasks(taskGenerator, resource, actionGroups, deps) {
           }.operations.${operation}`
         );
       }
+
       resourceConfig = {
         method,
         actions: defaultActions,
