@@ -7,11 +7,7 @@ import getActionGroups from '../src/getActionGroups';
 import generateThunk from '../src/redux-thunk/generateThunk';
 import generateEpic from '../src/redux-observable/generateEpic';
 
-// Testing utils
-import createActionSpies from './support/createActionSpies';
-
 const noop = () => null;
-
 
 const resources = {
   songs: {
@@ -179,6 +175,7 @@ describe('getTasks', () => {
         expect(tasks[opName].success).to.equal(actionGroups[opName].success);
         expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
         expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
+        return undefined;
       });
     });
 
@@ -195,6 +192,7 @@ describe('getTasks', () => {
         expect(tasks[opName].success).to.equal(actionGroups[opName].success);
         expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
         expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
+        return undefined;
       });
     });
   });
