@@ -1,3 +1,5 @@
+import { createAction } from 'redux-actions';
+
 const operationMethods = {
   create: 'post',
   read: 'get',
@@ -25,7 +27,9 @@ export default function getTasks(taskGenerator, resource, actionGroups, deps) {
       // String shorthand is allowed only for well known operation names
       if (!method) {
         throw new Error(
-          `The value of the custom operation name ${operation} must be an object`
+          `The value of the custom operation name ${operation} for ${
+            resource.name
+          } must be an object`
         );
       }
 
@@ -46,9 +50,30 @@ export default function getTasks(taskGenerator, resource, actionGroups, deps) {
         );
       }
 
+      const { actionTypes } = operationConfig;
+      const customActions = actionTypes
+        ? {
+            wait: createAction(actionTypes.wait),
+            success: createAction(actionTypes.success),
+            failure: createAction(actionTypes.failure)
+          }
+        : operationConfig.actions;
+
+      if (
+        (actionTypes && !actionTypes.wait) ||
+        !actionTypes.success ||
+        !actionTypes.failure
+      ) {
+        throw new Error(
+          `actionTypes of ${operation} for ${
+            resource.name
+          } must include all of 'wait', 'success' and 'failure'`
+        );
+      }
+
       resourceConfig = {
         method,
-        actions: defaultActions,
+        actions: customActions || defaultActions,
         ...operationConfig // Override the defaults with whatever the user provides
       };
     }

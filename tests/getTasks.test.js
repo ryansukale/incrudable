@@ -1,5 +1,6 @@
 /* global describe, it */
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiSubset from 'chai-subset';
 import sinon from 'sinon';
 
 import getTasks from '../src/getTasks';
@@ -7,6 +8,7 @@ import getActionGroups from '../src/getActionGroups';
 import generateThunk from '../src/redux-thunk/generateThunk';
 import generateEpic from '../src/redux-observable/generateEpic';
 
+chai.use(chaiSubset);
 const noop = () => null;
 
 const resources = {
@@ -60,6 +62,9 @@ describe('getTasks', () => {
         actions: defaultActionGroups.create
       };
 
+      const generatorSpy = sinon.spy(() => ({}));
+      getTasks(generatorSpy, resource, defaultActionGroups);
+
       verifyGeneratorArgs(resource, defaultActionGroups, expectedArgs);
     });
 
@@ -103,6 +108,46 @@ describe('getTasks', () => {
       };
 
       verifyGeneratorArgs(resource, defaultActionGroups, expectedArgs);
+    });
+
+    it('invokes the generator with custom actionTypes', () => {
+      const resource = {
+        name: 'songs',
+        operations: {
+          create: {
+            url: '/albums/:id/songs',
+            actionTypes: {
+              wait: 'CUSTOM_WAIT',
+              success: 'CUSTOM_SUCCESS',
+              failure: 'CUSTOM_FAILURE'
+            }
+          }
+        }
+      };
+
+      const expectedArgs = {
+        method: 'post',
+        operation: 'create',
+        url: resource.operations.create.url
+      };
+
+      const generatorSpy = sinon.spy(() => ({}));
+      getTasks(generatorSpy, resource, defaultActionGroups);
+
+      const args = generatorSpy.args[0][0];
+      console.log(args);
+
+      expect(args).to.containSubset(expectedArgs);
+
+      expect(args.actions.wait.toString()).to.equal(
+        resource.operations.create.actionTypes.wait
+      );
+      expect(args.actions.success.toString()).to.equal(
+        resource.operations.create.actionTypes.success
+      );
+      expect(args.actions.failure.toString()).to.equal(
+        resource.operations.create.actionTypes.failure
+      );
     });
 
     it('invokes the generator with custom onSuccess, onFailure and beforeSubmit handlers', () => {
