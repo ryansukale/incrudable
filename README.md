@@ -4,7 +4,11 @@ incrudable
 Automagically generate thunks or epics for your applications CRUD routes.
 
 #### Philosophy
-Assume you have crud resource that supported the following operations.
+Having to learn a new library is often a pain. While building incrudable, one of my goals was to allow developers to use all their existing knowledge on redux-thunks and thunks-observables, so it should be 100% compatible with existing codebases, and let this library just provide a bunch of utility functions to reduce boilerplate. 
+Use as little or as much as you need of this library. Everything is optional.
+
+#### What problem is it trying to solve
+Assume we can define a crud resource that supported the following operations.
 ```js
 const resources = {
   songs: {
@@ -19,67 +23,78 @@ const resources = {
   }
 };
 ```
-Lets take the first operation `create`. When a user interacts with the UI to create a song, ideally, within your application, there are 3 meaningful events that a store can handle in the below sequence
+For the sake of conversation, lets take the first operation - `create`. When a user interacts with the application to create a song, typically, there are 3 meaningful events that a store can handle in the below sequence(and perhaps its relevant to the UI as well)
 
 - 1 - Loading/Waiting - just before the request is made
 - 2 - Success - when a successful response is received
 - 3 - Failure - when an error occurs
 
-This implies that for the `create` operation, your application needs to dispatch 3 actions in a sequence. This same logic applies to all the operations of the song resource. As well as all the other resources within your application.
+This implies that for the `create` operation alone, your application needs to dispatch 3 actions in a sequence. This same logic applies to all the operations of the song resource. As well as all the other resources within your application.
 
-Incrudable attempts to solve this problem of writing boilerplate code by providing you with thunk and epic generators that enable this sequence of dispatch events. At the time of writing this library exposes two implementations of generators using `redux-thunks` and `redux-observable`.
+Incrudable attempts to solve this problem of writing boilerplate code (actions, thunks, epics) by providing you with thunk and epic generators that dispatch events in the sequence mentioned above. At the the time of writing, this library exposes two implementations of generators using `redux-thunks` and `redux-observable`, all the while exposing the exact same interface.
 
 #### redux-thunks
 
 ```js
-// File: modules/resources.js
-// Define the configuration for your resources as follows
-const resources = {
-  songs: {
-    name: 'songs',
-    operations: {
-      create: '/api/albums/:id/songs',
-      read: '/api/albums/:id/songs/:songId'
-      update: '/api/albums/:id/songs/:songId',
-      del: '/api/albums/:id/songs/:songId',
-      list: '/api/albums/:id/songs'
-    }
-  }
-};
-```
-
-```js
 // File: /modules/thunks/songs.js
 import incrudable from 'incrudable/lib/redux-thunks';
-import resources from '/modules/resources';
 
-const thunks = incrudable.fromResource(resources.songs);
+// Define the configuration for your resources as follows
+const resource = {
+  name: 'songs',
+  operations: {
+    create: '/api/albums/:id/songs',
+    read: '/api/albums/:id/songs/:songId'
+    update: '/api/albums/:id/songs/:songId',
+    del: '/api/albums/:id/songs/:songId',
+    list: '/api/albums/:id/songs',
+    customTask: {
+      method: 'GET',
+      url: '/api/albums/:id/songs',
+      actions: {wait: () => ..., success: () => ..., failure: () => ....}
+    }
+  }
+}
+
+const thunks = incrudable.fromResource(songs);
 export default thunks;
 
 /** This returns an object with the following properties corresponding to crud operations
 {
-  create: f(), // Thunks
+  create: f(), // Thunks/Tasks
   read: f(),
   update: f(),
   del: f(),
-  list: f()
+  list: f(),
+  customTask: f()
 }
 */
 ```
+
+The hash of functions above are called `tasks`. If you are using `redux-thunk`, they are simply plain ol thunks. I have only chosen to call them as `tasks` because their usage is the same even with `redux-observable` so it made sense to go with generic terminology. They do have some additional features, which are covered in the examples below.
+
+Below is an example of you can use one of these tasks.
 
 ```js
 // From within your react component
 // File: components/songs/Create.jsx
 import {songs} from 'modules/thunks/songs';
 
-const payload = {body: {title: 'Elements of Life', genre: 'trance'}};
-dispatch(songs.create(payload));
-
-// File: components/songs/ListSongs.jsx
-const payload = {query: {page: 10}};
-dispatch(songs.list(payload));
+class MyClass extends React.Component {
+    onCreate = () => {
+        ....
+        dispatch = ...// Assume you have access to the redux dispatch here, perhaps via context
+        const payload = {body: {title: 'Elements of Life', genre: 'trance'}};
+        dispatch(songs.create(payload));
+    }
+    render() {
+        ...All the good stuff...
+    }
+}
 
 ```
+
+And here's how you could use them in your reducer.
 
 ```js
 // File: modules/songs/reducer.js
@@ -94,19 +109,38 @@ function songssReducer(state, {action, payload}) {
       return {errors: payload};
     case songs.create.wait:
       return {isLoading: true};
-
-    case songs.list.success:
+    ...
+    ...
+    ...
+    case songs.customTask.success:
       return {...};
-    case songs.list.failure:
+    case songs.customTask.failure:
       return {...};
-    case songs.list.wait:
+    case songs.customTask.wait:
       return {...};
   }
 }
 ```
 ---
 
-You can reuse thunks and export custom actions. This comes in handy when you want to perform the operation of a thunk like fetching a list of things when filtering, sorting, etc but want to dispatch custom actions names based on business your business logic / query criteria.
+### So what's special about tasks
+If you notice in the example above, the exported tasks have 2 special characteristics
+- The format of the payload it expects.
+- The attributes that are available as event names to be used in the reducer
+
+### Payload format
+In order to provide the simplest interface while making minimal assumptions about your business logic, a task expects a payload to be an object of the following format
+```
+const payload = {
+    body: {}, // Required for operations that use the POST and PUT methods
+    params: {}, // Key value pairs provided here will be mapped to url params
+    query: {} // A hash that will be convered to a query string and appended to the url
+}
+```
+
+#### Customizing thunks/epics
+Each exported thunk corresponds to an endpoint url. Often times, your application needs to invoke the same endpoint, but for the different user interaction. For example.
+Given a list endpoint `albums/:id/songs`, its quite possible that your business logic demands to perform sorting or filtering as well. Since the operation of `list` is the same but the user interaction is different, custom actions can let you differentiate between the different types of calls.
 
 ```js
 // modules/albums/filter.js
@@ -289,3 +323,24 @@ dispatch(
 Available as an individual import as `import createCrudTasks from 'incrudable/lib/createCrudTasks';`
 
 ---
+
+#### Advanced configuration
+const resources = {
+  songs: {
+    name: 'songs',
+    operations: {
+      create: '/api/albums/:id/songs',
+      read: '/api/albums/:id/songs/:songId'
+      update: '/api/albums/:id/songs/:songId',
+      del: '/api/albums/:id/songs/:songId',
+      sortedList: {
+        url: '/api/albums/:id/songs',
+        method: 'GET',
+        actions: createActionGroup('SORTED_SONGS'),
+        beforeSubmit: data => data,
+        onSuccess: () => ...., // Custom handler
+        onFailure: () => .... // Custom handler
+      }
+    }
+  }
+};
