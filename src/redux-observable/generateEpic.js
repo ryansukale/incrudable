@@ -10,7 +10,13 @@ function identityStream(data) {
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
-  const { url, actions } = config;
+  const {
+    url,
+    actions,
+    onSuccess = onJsonApiResponse,
+    onFailure = onJsonApiError,
+    beforeSubmit = identityStream
+  } = config;
 
   function task(request) {
     return actions.wait(request);
@@ -21,8 +27,6 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
       params: request.params,
       query: request.query
     });
-    const onFailure = task.onFailure || config.onFailure || onJsonApiError;
-    const onSuccess = task.onSuccess || config.onSuccess || onJsonApiResponse;
     const handlerConfig = { actions, onFailure };
 
     return from(ajax[ajaxMethodName](path, request)).pipe(
@@ -34,11 +38,7 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
   function epic(action$) {
     return action$.pipe(
       filter(actions.wait),
-      switchMap(({ payload }) => {
-        const beforeSubmit =
-          task.beforeSubmit || config.beforeSubmit || identityStream;
-        return beforeSubmit(payload);
-      }),
+      switchMap(({ payload }) => beforeSubmit(payload)),
       switchMap(submit)
     );
   }

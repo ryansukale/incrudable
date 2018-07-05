@@ -8,16 +8,17 @@ function identity(data) {
 }
 
 export function getThunkCreator(ajaxMethodName, config, { ajax }) {
-  return function thunk(request, done) {
+  return function(request, done) {
     return dispatch => {
-      const { url, actions } = config;
+      const {
+        url,
+        actions,
+        onSuccess = onJsonApiResponse,
+        onFailure = onJsonApiError,
+        beforeSubmit = identity
+      } = config;
 
       const actionObject = actions.wait(request);
-      const beforeSubmit =
-        thunk.beforeSubmit || config.beforeSubmit || identity;
-      const onSuccess =
-        thunk.onSuccess || config.onSuccess || onJsonApiResponse;
-      const onFailure = thunk.onFailure || config.onFailure || onJsonApiError;
 
       dispatch(actionObject);
 

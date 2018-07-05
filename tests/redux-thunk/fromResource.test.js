@@ -4,7 +4,6 @@ import sinon from 'sinon';
 
 import fromResource from '../../src/redux-thunk/fromResource';
 
-const errorUtil = message => () => Promise.reject(`error ${message}`);
 const successUtil = message => () => Promise.resolve(`test ${message}`);
 
 function createSpySuccessAjax() {
@@ -13,15 +12,6 @@ function createSpySuccessAjax() {
     getJSON: sinon.spy(successUtil('getJSON')),
     putJSON: sinon.spy(successUtil('putJSON')),
     delJSON: sinon.spy(successUtil('delJSON'))
-  };
-}
-
-function createSpyFailureAjax() {
-  return {
-    postJSON: sinon.spy(errorUtil('postJSON')),
-    getJSON: sinon.spy(errorUtil('getJSON')),
-    putJSON: sinon.spy(errorUtil('putJSON')),
-    delJSON: sinon.spy(errorUtil('delJSON'))
   };
 }
 
@@ -36,46 +26,6 @@ const resource = {
     list: '/albums/:id/songs'
   }
 };
-
-function testCustomBeforeSubmit(operation) {
-  const tasks = fromResource(resource, config);
-  const request = { body: 'hello', params: { id: 10, songId: 20 } };
-  const customRequest = {
-    body: 'hello',
-    params: { id: 'custom_id', songId: 'custom_songId' }
-  };
-  const dispatch = sinon.spy();
-
-  tasks[operation].beforeSubmit = sinon.spy(() => customRequest);
-
-  return tasks[operation](request)(dispatch).then(() => {
-    expect(tasks[operation].beforeSubmit.calledOnce).to.equal(true);
-  });
-}
-
-function testCustomOnFailure(operation) {
-  const tasks = fromResource(resource, { ajax: createSpyFailureAjax() });
-  const request = { body: 'hello', params: { id: 10, songId: 20 } };
-  const dispatch = sinon.spy();
-
-  tasks[operation].onFailure = sinon.spy();
-
-  return tasks[operation](request)(dispatch).then(() => {
-    expect(tasks[operation].onFailure.calledOnce).to.equal(true);
-  });
-}
-
-function testCustomOnSuccess(operation) {
-  const tasks = fromResource(resource, config);
-  const request = { body: 'hello', params: { id: 10, songId: 20 } };
-  const dispatch = sinon.spy();
-
-  tasks[operation].onSuccess = sinon.spy();
-
-  return tasks[operation](request)(dispatch).then(() => {
-    expect(tasks[operation].onSuccess.calledOnce).to.equal(true);
-  });
-}
 
 describe('fromResource: redux-thunk', () => {
   beforeEach(() => {
@@ -111,18 +61,6 @@ describe('fromResource: redux-thunk', () => {
           );
         });
     });
-
-    it('allows a custom beforeSubmit', () => {
-      return testCustomBeforeSubmit('create');
-    });
-
-    it('allows a custom onFailure', () => {
-      return testCustomOnFailure('create');
-    });
-
-    it('allows a custom onSuccess', () => {
-      return testCustomOnSuccess('create');
-    });
   });
 
   describe('read operation', () => {
@@ -153,18 +91,6 @@ describe('fromResource: redux-thunk', () => {
             '/albums/10/songs/20'
           );
         });
-    });
-
-    it('allows a custom beforeSubmit', () => {
-      return testCustomBeforeSubmit('read');
-    });
-
-    it('allows a custom onFailure', () => {
-      return testCustomOnFailure('read');
-    });
-
-    it('allows a custom onSuccess', () => {
-      return testCustomOnSuccess('read');
     });
   });
 
@@ -197,18 +123,6 @@ describe('fromResource: redux-thunk', () => {
           );
         });
     });
-
-    it('allows a custom beforeSubmit', () => {
-      return testCustomBeforeSubmit('update');
-    });
-
-    it('allows a custom onFailure', () => {
-      return testCustomOnFailure('update');
-    });
-
-    it('allows a custom onSuccess', () => {
-      return testCustomOnSuccess('update');
-    });
   });
 
   describe('del operation', () => {
@@ -240,18 +154,6 @@ describe('fromResource: redux-thunk', () => {
           );
         });
     });
-
-    it('allows a custom beforeSubmit', () => {
-      return testCustomBeforeSubmit('del');
-    });
-
-    it('allows a custom onFailure', () => {
-      return testCustomOnFailure('del');
-    });
-
-    it('allows a custom onSuccess', () => {
-      return testCustomOnSuccess('del');
-    });
   });
 
   describe('list operation', () => {
@@ -282,18 +184,6 @@ describe('fromResource: redux-thunk', () => {
             '/albums/10/songs'
           );
         });
-    });
-
-    it('allows a custom beforeSubmit', () => {
-      return testCustomBeforeSubmit('list');
-    });
-
-    it('allows a custom onFailure', () => {
-      return testCustomOnFailure('list');
-    });
-
-    it('allows a custom onSuccess', () => {
-      return testCustomOnSuccess('list');
     });
   });
 });
