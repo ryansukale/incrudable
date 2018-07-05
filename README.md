@@ -3,11 +3,24 @@ incrudable
 
 Automagically generate thunks or epics for your applications CRUD routes.
 
-#### Philosophy
+---
+
+### Setup
+```
+yarn add incrudable
+// OR
+npm install incrudable --save
+```
+
+---
+
+### Philosophy
 Having to learn a new library is often a pain. While building incrudable, one of my goals was to allow developers to use all their existing knowledge on redux-thunks and thunks-observables, so it should be 100% compatible with existing codebases, and let this library just provide a bunch of utility functions to reduce boilerplate. 
 Use as little or as much as you need of this library. Everything is optional.
 
-#### What problem is it trying to solve
+---
+
+### What problem is it trying to solve
 Assume we can define a crud resource that supported the following operations.
 ```js
 const resources = {
@@ -33,12 +46,11 @@ This implies that for the `create` operation alone, your application needs to di
 
 Incrudable attempts to solve this problem of writing boilerplate code (actions, thunks, epics) by providing you with thunk and epic generators that dispatch events in the sequence mentioned above. At the the time of writing, this library exposes two implementations of generators using `redux-thunks` and `redux-observable`, all the while exposing the exact same interface.
 
-#### redux-thunks
-
 ```js
 // File: /modules/thunks/songs.js
 import incrudable from 'incrudable/lib/redux-thunks';
-
+OR
+import incrudable from 'incrudable/lib/redux-observable';
 // Define the configuration for your resources as follows
 const resource = {
   name: 'songs',
@@ -50,8 +62,7 @@ const resource = {
     list: '/api/albums/:id/songs',
     customTask: {
       method: 'GET',
-      url: '/api/albums/:id/songs',
-      actions: {wait: () => ..., success: () => ..., failure: () => ....}
+      url: '/api/albums/:id/songs'
     }
   }
 }
@@ -103,11 +114,11 @@ import {songs} from 'modules/songs/thunks';
 // Your reducer now automatically has access to three events on each crud operation of the resource
 function songssReducer(state, {action, payload}) {
   switch (action) {
-    case songs.create.success:
+    case songs.create.success: // OR 'CREATE_SONGS_SUCCESS'
       return {latest: payload};
-    case songs.create.failure:
+    case songs.create.failure: // OR 'CREATE_SONGS_FAILURE' 
       return {errors: payload};
-    case songs.create.wait:
+    case songs.create.wait:  // OR 'CREATE_SONGS_WAIT'
       return {isLoading: true};
     ...
     ...
@@ -123,10 +134,15 @@ function songssReducer(state, {action, payload}) {
 ```
 ---
 
-### So what's special about tasks
+### Is there anything special about tasks?
+
 If you notice in the example above, the exported tasks have 2 special characteristics
 - The format of the payload it expects.
 - The attributes that are available as event names to be used in the reducer
+
+Both of these are covered in the following sections.
+
+---
 
 ### Payload format
 In order to provide the simplest interface while making minimal assumptions about your business logic, a task expects a payload to be an object of the following format
@@ -138,8 +154,37 @@ const payload = {
 }
 ```
 
-#### Customizing thunks/epics
-Each exported thunk corresponds to an endpoint url. Often times, your application needs to invoke the same endpoint, but for the different user interaction. For example.
+---
+
+### Customizing operations
+Each named operation of a resources corresponds to an endpoint url. By default, `incrudable` use a few well known operation names to guess their http method
+|operation name | method|
+|---|---|
+|create| POST|
+|read| GET|
+|update| PUT|
+|del| DELETE|
+|list| GET|
+
+You can also create custom operation names and specify their http methods and url. e.g.
+```js
+const resource = {
+  name: 'songs',
+  operations: {
+    create: '/api/albums/:id/songs',
+    ....
+    ....
+    sortedList: { // Custom operation name
+      url: '/api/albums/:id/songs',
+      method: 'GET'
+    }
+  }
+}
+```
+
+---
+
+Often times, your application needs to invoke the same endpoint, but for the different user interaction. For example.
 Given a list endpoint `albums/:id/songs`, its quite possible that your business logic demands to perform sorting or filtering as well. Since the operation of `list` is the same but the user interaction is different, custom actions can let you differentiate between the different types of calls.
 
 ```js
