@@ -5,13 +5,13 @@ import sinon from 'sinon';
 import getTasks from '../src/getTasks';
 import getActionGroups from '../src/getActionGroups';
 import generateThunk from '../src/redux-thunk/generateThunk';
+import generateEpic from '../src/redux-observable/generateEpic';
 
 // Testing utils
 import createActionSpies from './support/createActionSpies';
 
 const noop = () => null;
 
-// Import generateEpic from '../src/redux-observable/generateEpic';
 
 const resources = {
   songs: {
@@ -29,13 +29,6 @@ const resources = {
     }
   }
 };
-
-function assertThunkInterface(tasks, opName, actionGroups) {
-  expect(tasks[opName]).to.be.a('function');
-  expect(tasks[opName].success).to.equal(actionGroups[opName].success);
-  expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
-  expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
-}
 
 describe('getTasks', () => {
   const defaultActionGroups = {
@@ -173,7 +166,7 @@ describe('getTasks', () => {
     });
   });
 
-  describe('redux-thunk tasks', () => {
+  describe('task interface', () => {
     it('creates tasks based on generateThunk', () => {
       const { songs } = resources;
       const generatorSpy = sinon.spy(generateThunk);
@@ -181,32 +174,27 @@ describe('getTasks', () => {
       const actionGroups = getActionGroups(songs, songs.operations);
       const tasks = getTasks(generatorSpy, songs, actionGroups);
 
-      Object.keys(songs.operations).map(opName =>
-        assertThunkInterface(tasks, opName, actionGroups)
-      );
+      Object.keys(songs.operations).map(opName => {
+        expect(tasks[opName]).to.be.a('function');
+        expect(tasks[opName].success).to.equal(actionGroups[opName].success);
+        expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
+        expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
+      });
     });
 
-    it('invokes generateThunk with the custom actions', () => {
-      const resource = {
-        name: 'songs',
-        operations: {
-          filteredList: {
-            method: 'GET',
-            url: '/albums/:id/songs',
-            actions: createActionSpies('FILTERED_SONGS')
-          }
-        }
-      };
-      const generatorSpy = sinon.spy(generateThunk);
-      const tasks = getTasks(generatorSpy, resource, {});
-      const actionGroups = {
-        filteredList: resource.operations.filteredList.actions
-      };
+    it('creates tasks based on generateEpic', () => {
+      const { songs } = resources;
+      const generatorSpy = sinon.spy(generateEpic);
 
-      assertThunkInterface(tasks, 'filteredList', actionGroups);
-      expect(generatorSpy.args[0][0]).to.deep.equal({
-        operation: 'filteredList',
-        ...resource.operations.filteredList
+      const actionGroups = getActionGroups(songs, songs.operations);
+      const tasks = getTasks(generatorSpy, songs, actionGroups);
+
+      Object.keys(songs.operations).map(opName => {
+        expect(tasks[opName]).to.be.a('function');
+        expect(tasks[opName].epic).to.be.a('function');
+        expect(tasks[opName].success).to.equal(actionGroups[opName].success);
+        expect(tasks[opName].failure).to.equal(actionGroups[opName].failure);
+        expect(tasks[opName].wait).to.equal(actionGroups[opName].wait);
       });
     });
   });
