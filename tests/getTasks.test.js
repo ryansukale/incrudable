@@ -135,7 +135,6 @@ describe('getTasks', () => {
       getTasks(generatorSpy, resource, defaultActionGroups);
 
       const args = generatorSpy.args[0][0];
-      console.log(args);
 
       expect(args).to.containSubset(expectedArgs);
 

@@ -2,6 +2,7 @@
 import { of } from 'rxjs';
 import { expect } from 'chai';
 import sinon from 'sinon';
+import { debounceTime, map } from 'rxjs/operators';
 
 import createActionGroup from '../../src/createActionGroup';
 import generateEpic, {
@@ -346,15 +347,16 @@ describe('generateEpic', () => {
       });
     });
 
-    it('invokes the custom beforeSubmit function', done => {
+    it('invokes the custom beforeSubmit function t', done => {
       const prefix = 'prefix';
-      const beforeSubmit = sinon.spy(request => {
-        // Return a custom payload
-        return of({
-          params: {
-            id: `${prefix}_${request.params.id}`
-          }
-        });
+      const paramsPreprocessor = sinon.spy(request => ({
+        params: {
+          id: `${prefix}_${request.params.id}`
+        }
+      }));
+
+      const beforeSubmit = sinon.spy(request$ => {
+        return request$.pipe(map(paramsPreprocessor));
       });
       const getJSON = sinon.spy(() => Promise.resolve({}));
 
@@ -369,14 +371,62 @@ describe('generateEpic', () => {
 
       epic(action$).subscribe(() => {
         expect(actions.wait.args[0][0]).to.deep.equal(request);
-        // Custom beforeSubmit is called
+        // BeforeSubmit should have been called
         expect(beforeSubmit.calledOnce).to.equal(true);
-        // BeforeSubmit is called with the same argument as the output of the wait action
-        expect(beforeSubmit.args[0][0]).to.deep.equal(request);
+        // ParamsPreprocessor is called with the same argument as the output of the wait action
+        // expect(paramsPreprocessor.args[0][0]).to.deep.equal(request);
 
         // Ensure that the payload of the preprocessor is used as the request
         expect(getJSON.args[0][1]).to.deep.equal({
           params: { id: 'prefix_10' }
+        });
+
+        done();
+      });
+    });
+
+    it('invokes the custom beforeSubmit function that is debounced', done => {
+      const prefix = 'prefix';
+
+      const paramsPreprocessor = sinon.spy(request => ({
+        params: {
+          id: `${prefix}_${request.params.id}`
+        }
+      }));
+      const beforeSubmit = sinon.spy(request$ => {
+        // Return a custom payload after after a debounce
+        return request$.pipe(
+          debounceTime(200),
+          map(paramsPreprocessor)
+        );
+      });
+      const getJSON = sinon.spy(() => Promise.resolve({}));
+      const requestOne = { params: { id: 10 } };
+      const requestTwo = { params: { id: 20 } };
+
+      const { operation, actions } = prepareData({
+        beforeSubmit,
+        ajax: { getJSON }
+      });
+      const { epic } = operation;
+
+      const action$ = of(operation(requestOne), operation(requestTwo));
+
+      epic(action$).subscribe(() => {
+        expect(actions.wait.args[0][0]).to.deep.equal(requestOne);
+        expect(actions.wait.args[1][0]).to.deep.equal(requestTwo);
+
+        // Custom beforeSubmit is called
+        expect(beforeSubmit.calledOnce).to.equal(true);
+
+        // Since the stream in beforeSubmit is debounced,
+        // the paramsPreprocessor and the getJSON should only be called once
+        expect(paramsPreprocessor.calledOnce).to.equal(true);
+
+        // GetJSON should only be called once with the latest debounced input
+        expect(getJSON.calledOnce).to.equal(true);
+        expect(getJSON.args[0][1]).to.deep.equal({
+          params: { id: 'prefix_20' }
         });
 
         done();

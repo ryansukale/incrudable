@@ -60,11 +60,8 @@ export default function getTasks(taskGenerator, resource, actionGroups, deps) {
         : operationConfig.actions;
 
       if (
-        actionTypes && (
-          !actionTypes.wait ||
-          !actionTypes.success ||
-          !actionTypes.failure
-        )
+        actionTypes &&
+        (!actionTypes.wait || !actionTypes.success || !actionTypes.failure)
       ) {
         throw new Error(
           `actionTypes of ${operation} for ${

@@ -5,8 +5,8 @@ import createUrl from 'batarang/createUrl';
 import ajaxObservable from './ajaxObservable';
 import { onJsonApiResponse, onJsonApiError } from './handlers';
 
-function identityStream(data) {
-  return of(data);
+function identity(data) {
+  return data;
 }
 
 export function epicGenerator(ajaxMethodName, config, { ajax }) {
@@ -15,7 +15,7 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
     actions,
     onSuccess = onJsonApiResponse,
     onFailure = onJsonApiError,
-    beforeSubmit = identityStream
+    beforeSubmit = identity
   } = config;
 
   function task(request) {
@@ -38,7 +38,8 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
   function epic(action$) {
     return action$.pipe(
       filter(actions.wait),
-      switchMap(({ payload }) => beforeSubmit(payload)),
+      map(({ payload }) => payload),
+      beforeSubmit,
       switchMap(submit)
     );
   }
