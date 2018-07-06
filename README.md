@@ -14,6 +14,10 @@ npm install incrudable --save
 
 ---
 
+**NOTE**: If you are using `redux-observable`, this library relies on Rxjs 6+ which has several differences from Rxjs 5. Please see the [Rxjs repository](https://github.com/ReactiveX/rxjs) for more information on backward compatibility and migration.
+
+---
+
 ### Philosophy
 Having to learn a new library is often a pain. While building incrudable, one of my goals was to allow developers to use all their existing knowledge on `redux-thunks` and `redux-observables`( so it should be 100% compatible with existing codebases), and let this library just provide a bunch of utility functions to reduce boilerplate.
 
@@ -229,6 +233,26 @@ const resource = {
 
 The custom actionTypes hash must have 3 keys - `wait`, `success`, and `failure` since these are the actions that that will be called in the lifecycle of the whenever the thunk/epic is invoked by your. application.
 
+
+The nice thing about operation customization is that they can be done for the well-known operations like `create`, `read`, `update`, `del`, and `list` and  as well. For example
+
+```js
+const resource = {
+  name: 'songs',
+  operations: {
+    create: {
+      url: '/api/albums/:id/songs',
+      method: 'POST',
+      actionsTypes: { // Custom event names hash for the lifecycle events
+        wait: 'CUSTOM_SONGS_LOADING',
+        success: 'CUSTOM_SONGS_DONE',
+        failure: 'CUSTOM_SONGS_ERROR'
+      }
+    }
+  }
+};
+```
+
 ---
 
 ### Lifecycle hooks
@@ -237,14 +261,18 @@ Apart from letting you customize the actions and methods, the library also lets 
 #### beforeSumit
 A function that receives the data of the request and must return a value that is treated as the request. The beforeSubmit function is a great place to
 1) Handle custom parsing of request data e.g. if you'd like to create derived parameters based on user input.
-2) Debounce expensive operations
+2) Debounce/delay expensive operations
 
-If you are using `redux-thunks`, the return value can be one of
+Due to the inherent difference in implemenations of `redux-thunk` and `redux-observable`, the signature of the beforeSubmit function is slightly different. An simple example for both has been provided belowl.
+
+##### Usage with redux-thunks, 
+**Signature**: `beforeSubmit(object)`
+**Arguments**
+`object`: This is same as the request that the thunk was called with.
+**Return value**
+This can be one of
 1) An object. By default, the original request payload is returned.
 2) A Promise - Which resolves with an object which represents the request.
-
-If you are using `redux-observable`, the return value can be
-1) An observable stream
 
 The following examples demonstrate the using a debounced beforeSubmit for both `redux-thunks` and `redux-observables`
 
@@ -256,11 +284,11 @@ import pDebounce = from 'p-debounce';
 // and want to transform the original params before they can get processed
 const beforeSubmit = pDebounce((request) => {
   // Do expensive stuff here if necessary
-  // Return a custom payload or return the request itself
+  // Return a custom payload or return the original request itself
   return {
     ...request,
     params: {
-      id: `#_${request.params.id}`
+      query: {term: request.query.term.trim()}
     }
   };
 }, 200);
@@ -268,89 +296,55 @@ const beforeSubmit = pDebounce((request) => {
 const resource = {
   name: 'songs',
   operations: {
-    create: {
-      url: '/api/albums/:id/songs',
-      method: 'POST',
+    search: {
+      url: '/api/search',
+      method: 'GET',
       beforeSubmit
   }
 };
 ```
 
+##### Usage with redux-observable, 
+**Signature**: `beforeSubmit(stream)`
+**Arguments**
+`stream`: This is an observable stream that only contains data specific to this task.
+**Return value**
+This must be
+1) An observable stream whose data represents the request to be processed.
+
+The example below demonstrates both debouncing as well as parameter transformation. Since you have access to the request stream, you are free to do whatever you want as long as you return a request stream for further processing the lifecycle.
+
 ```js
+// Import Rxjs 6 operators
 import { debounceTime, map } from 'rxjs/operators';
 
-const beforeSubmit = request => {
-  // TODO: Debounce
-  // Do expensive stuff here
-  // Return a custom payload or return the request itself
-  return of({
-    params: {
-      id: `#_${request.params.id}`
-    }
-  });
+const beforeSubmit = request$ => {
+  // Return a custom payload after after a debounce
+  // Or simply the original request object
+  return request$.pipe(
+    debounceTime(200),
+    map(request => {
+      return {
+        ...request,
+        params: {
+          query: {term: request.query.term.trim()}
+        }
+    })
+  );
 };
-```
 
-
-
-
-
-Often times, your application needs to invoke the same endpoint, but for the different user interaction. For example.
-Given a list endpoint `albums/:id/songs`, its quite possible that your business logic demands to perform sorting or filtering as well. Since the operation of `list` is the same but the user interaction is different, custom actions can let you differentiate between the different types of calls.
-
-```js
-// modules/albums/filter.js
-import createActionGroup from 'incrudable/lib/createActionGroup';
-
-import {albums} from 'modules/songs/resources';
-
-// Create and export your application specific action group
-// File: modules/songs/actions.js
-export default {
-    filter: createActionGroup('FILTER_SONGS'),
-    sort: createActionGroup('SORT_SONGS')
-};
-```
-```js
-// Reuse the list thunk, but dispatch your custom action groups
-// File: components/songs/List.jsx
-import songActions from 'modules/songs/actions';
-const payload = {query: {genre: 'trance'}};
-dispatch(
-  songs.list(payload, {actions: songActions.filter})
-);
-```
-
-```js
-// File: modules/songs/reducer.js
-import {songs} from 'modules/songs/thunks';
-import songActions from 'modules/songs/actions';
-
-// Plain old switch based reducers
-function albumsReducer(state, {action, payload}) {
-  switch (action) {
-    case songs.create.success:
-      return {latest: payload};
-    // ... existing action handlers
-    
-    // Custom action handlers
-    case songActions.filter.success:
-      return {by_genre: payload};
-    case songActionsfilter.failure:
-      return {errors: payload};
-    case songActions.filter.wait:
-      return {isFiltering: true};
+const resource = {
+  name: 'songs',
+  operations: {
+    search: {
+      url: '/api/search',
+      method: 'GET',
+      beforeSubmit
   }
-}
-
+};
 ```
 
 ---
-
-
-
-// If you are using redux-observable
-// import incrudable from 'incrudable/lib/redux-observable';
 
 #### incrudable
 
@@ -476,27 +470,4 @@ dispatch(
 );
 ```
 
-Available as an individual import as `import createCrudTasks from 'incrudable/lib/createCrudTasks';`
-
 ---
-
-#### Advanced configuration
-const resources = {
-  songs: {
-    name: 'songs',
-    operations: {
-      create: '/api/albums/:id/songs',
-      read: '/api/albums/:id/songs/:songId'
-      update: '/api/albums/:id/songs/:songId',
-      del: '/api/albums/:id/songs/:songId',
-      sortedList: {
-        url: '/api/albums/:id/songs',
-        method: 'GET',
-        actions: createActionGroup('SORTED_SONGS'),
-        beforeSubmit: data => data,
-        onSuccess: () => ...., // Custom handler
-        onFailure: () => .... // Custom handler
-      }
-    }
-  }
-};
