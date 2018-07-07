@@ -346,6 +346,86 @@ const resource = {
 
 ---
 
+# Custom onSuccess and onFailure
+Just like onSubmit, you can pass custom onSuccess and onFailure handlers. The following examples demonstrate the usage.
+
+##### Usage with redux-thunks
+```js
+// Custom Success handler
+export function customOnSuccess(
+  { actions, dispatch },
+  request,
+  response
+) {
+  // You have access to the original request payload and the dispatch.
+  // Since we are inside a thunk, you can dispatch as many times as you may please.
+  const payload = { request, response };
+  dispatch(actions.success(payload));
+}
+
+// Custom Error handler
+export function customOnFailure(
+  { actions, dispatch },
+  request,
+  response
+) {
+  // You have access to the original request payload and the dispatch.
+  // Since we are inside a thunk, you can dispatch as many times as you may please.
+  const payload = {
+    request,
+    errors: response.errors || response
+  };
+  
+  dispatch(actions.failure(payload));
+}
+
+const resource = {
+  name: 'songs',
+  operations: {
+    search: {
+      url: '/api/search',
+      method: 'GET',
+      onSuccess: customOnSuccess,
+      onFailure: customOnFailure
+  }
+};
+
+```
+
+##### Usage with redux-observable
+The success and failure handlers keep in line with the redux-observable's philosophy of actions in -> actions out. This is different from `redux-thunks` because an epic can only return 1 action per invocation.
+
+```js
+export function customOnSuccess({ actions }, request, response) {
+  const payload = { request, response };
+  return actions.success(payload); // OR You can dispatch any action you wish
+}
+
+export function customOnFailure({ actions }, request, response) {
+  const payload = {
+    request,
+    errors: response.errors || response
+  };
+  return actions.failure(payload);
+}
+
+const resource = {
+  name: 'songs',
+  operations: {
+    search: {
+      url: '/api/search',
+      method: 'GET',
+      onSuccess: customOnSuccess,
+      onFailure: customOnFailure
+  }
+};
+
+```
+
+Notice that the way you configure your resource to use the custom handlers is exactly same, irrespective of `redux-thunk` or `redux-observable`. This gives you the flexibility of using both, the frameworks in your application at the same time, if you choose to do so.
+
+---
+
 #### incrudable
 
 Acceps a hash of resource configurations and generates corresponding thunks and actions
