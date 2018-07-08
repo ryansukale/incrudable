@@ -77,7 +77,7 @@ export default thunks;
 
 /** This returns an object with the following properties corresponding to crud operations
 {
-  create: f(), // Thunks/Tasks
+  create: f(), // Tasks / Thunks
   read: f(),
   update: f(),
   del: f(),
@@ -88,6 +88,45 @@ export default thunks;
 ```
 
 The hash of functions above are called `tasks`. If you are using `redux-thunk`, they are simply plain ol thunks. I have only chosen to call them as `tasks` because their usage is the same even with `redux-observable` so it made sense to go with generic terminology. They do have some additional features, which are covered in the examples below.
+
+---
+
+### Setup
+Setting up `redux-thunk` is done as per [their documentation]. And since the tasks are simply thunks, you can start using them thunks right away in your react components.
+
+If you are using redux-observable, you need to integrate the epics with the store. Therefore each task created via `incrudable/lib/redux-observable` has a special property called `epic` that you can use during your middleware integration. It also exports a top level epic which can be used as a root epic, which is the result of combining all the child epics.
+
+```js
+import { combineEpics } from 'redux-observable';
+import incrudable from 'incrudable/lib/redux-observable';
+
+const songs = {
+  name: 'songs',
+  operations: {....}
+};
+
+const albums = {
+  name: 'songs',
+  operations: {....}
+};
+
+const sources = incrudable({songs, albums});
+// sources.songs.create, sources.songs.read ... : Tasks
+// sources.albums.create, sources.albums.read : Tasks
+// sources.epic : Root level epic by combining all sub epics
+export rootEpic = sources.epic;
+
+// This is equivalent to
+
+const songTasks = incrudable.fromResource(songs);
+// songTasks.songs.create, sources.songs.read ... : Tasks
+const albumTasks = incrudable.fromResource(albums);
+// albumTasks.albums.create, sources.albums.read : Tasks
+
+export rootEpic = combineEpics(songTasks.epic, albumTasks.epic);
+```
+
+Once you have a rootEpic, you can integrate it by following the official `redux-observable` [docs](https://redux-observable.js.org/docs/basics/SettingUpTheMiddleware.html).
 
 Below is an example of you can use one of these tasks.
 
@@ -431,13 +470,14 @@ Notice that the way you configure your resource to use the custom handlers is ex
 Acceps a hash of resource configurations and generates corresponding thunks and actions
 
 ```js
-import incrudable from 'incrudable/redux-thunk';
+import incrudable from 'incrudable/lib/redux-thunk';
+OR
+import incrudable from 'incrudable/lib/redux-observable';
 
 // Define the configuration for your resources as follows
 const resources = {
   albums: {
     name: 'albums',
-    singular: 'album',
     operations: {
       create: '/api/albums',
       read: '/api/albums/:id'
@@ -448,7 +488,6 @@ const resources = {
   },
   songs: {
     name: 'songs',
-    singular: 'song',
     operations: {
       create: '/api/albums/:id/songs',
       read: '/api/albums/:id/songs/:song-id'
@@ -462,6 +501,8 @@ const resources = {
 export default incrudable(resources);
 
 ```
+
+By default 
 
 ---
 
