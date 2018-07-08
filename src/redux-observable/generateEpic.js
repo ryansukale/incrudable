@@ -1,4 +1,5 @@
 import { from, of } from 'rxjs';
+import { ofType } from 'redux-observable';
 import { map, filter, switchMap, catchError } from 'rxjs/operators';
 import createUrl from 'batarang/createUrl';
 
@@ -37,7 +38,7 @@ export function epicGenerator(ajaxMethodName, config, { ajax }) {
 
   function epic(action$) {
     return action$.pipe(
-      filter(actions.wait),
+      ofType(actions.wait.toString()),
       map(({ payload }) => payload),
       beforeSubmit,
       switchMap(submit)
@@ -89,6 +90,6 @@ export default function generateEpic(
   }
 
   deps.ajax = deps.ajax || ajaxObservable(deps.getHeaders);
-
+  
   return generator({ url, actions, onSuccess, onFailure, beforeSubmit }, deps);
 }

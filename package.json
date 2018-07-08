@@ -53,8 +53,8 @@
   },
   "dependencies": {
     "batarang": "^2.0.12",
-    "redux-actions": "^2.3.0",
-    "redux-observable": "^0.18.0",
+    "redux-actions": "^2.4.0",
+    "redux-observable": "^1.0.0",
     "rx-lite-dom-ajax": "^7.0.3",
     "rxjs": "^6.2.0",
     "whatwg-fetch": "^2.0.4"

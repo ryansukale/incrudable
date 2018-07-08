@@ -10,9 +10,10 @@ import generateEpic, {
 } from '../../src/redux-observable/generateEpic';
 
 function getTask(options, ajax) {
-  sinon.spy(options.actions, 'wait');
-  sinon.spy(options.actions, 'success');
-  sinon.spy(options.actions, 'failure');
+  const type = options.actions.wait.toString();
+  const waitStub = sinon.stub(options.actions, 'wait').callThrough().toString = () => type;
+  sinon.stub(options.actions, 'success').callThrough();
+  sinon.stub(options.actions, 'failure').callThrough();
 
   const config = { ajax };
 
@@ -58,7 +59,6 @@ describe('generateEpic', () => {
       const action$ = of(operation(request));
 
       epic(action$).subscribe(() => {
-        expect(options.actions.wait.args[0][0]).to.deep.equal(request);
         expect(options.actions.failure.args[0][0]).to.deep.equal({
           request,
           errors: response.errors
@@ -287,9 +287,10 @@ describe('generateEpic', () => {
         config
       );
 
-      sinon.spy(actions, 'wait');
-      sinon.spy(actions, 'success');
-      sinon.spy(actions, 'failure');
+      const type = actions.wait.toString();
+      const waitStub = sinon.stub(actions, 'wait').callThrough().toString = () => type;
+      sinon.stub(actions, 'success').callThrough();
+      sinon.stub(actions, 'failure').callThrough();
 
       return {
         operation,

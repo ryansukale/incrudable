@@ -39,7 +39,7 @@ describe('fromResource: redux-observable', () => {
       const request = { body: 'hello', params: { id: 10 } };
       const action$ = of(tasks.create(request));
 
-      tasks.create.epic(action$).subscribe(({ payload }) => {
+      tasks.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
           response: { message: 'test postJSON' }
@@ -54,9 +54,9 @@ describe('fromResource: redux-observable', () => {
     it('generates a READ epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { params: { id: 10, songId: 20 } };
-      const action$ = of(tasks.create(request));
+      const action$ = of(tasks.read(request));
 
-      tasks.read.epic(action$).subscribe(({ payload }) => {
+      tasks.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
           response: { message: 'test getJSON' }
@@ -71,9 +71,9 @@ describe('fromResource: redux-observable', () => {
     it('generates a UPDATE epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { body: 'hello', params: { id: 10, songId: 20 } };
-      const action$ = of(tasks.create(request));
+      const action$ = of(tasks.update(request));
 
-      tasks.update.epic(action$).subscribe(({ payload }) => {
+      tasks.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
           response: { message: 'test putJSON' }
@@ -88,9 +88,9 @@ describe('fromResource: redux-observable', () => {
     it('generates a DEL epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { params: { id: 10, songId: 20 } };
-      const action$ = of(tasks.create(request));
+      const action$ = of(tasks.del(request));
 
-      tasks.del.epic(action$).subscribe(({ payload }) => {
+      tasks.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
           response: { message: 'test delJSON' }
@@ -105,9 +105,9 @@ describe('fromResource: redux-observable', () => {
     it('generates a LIST epic for a resource with actions', done => {
       const tasks = fromResource(resource, config);
       const request = { params: { id: 10 } };
-      const action$ = of(tasks.create(request));
+      const action$ = of(tasks.list(request));
 
-      tasks.list.epic(action$).subscribe(({ payload }) => {
+      tasks.epic(action$).subscribe(({ payload }) => {
         expect(payload).to.deep.equal({
           request,
           response: { message: 'test getJSON' }
@@ -117,4 +117,19 @@ describe('fromResource: redux-observable', () => {
       });
     });
   });
+
+  // it('creates an root epic for all the operations', done => {
+  //   const tasks = fromResource(resource, config);
+  //   const request = { params: { id: 10 } };
+  //   const action$ = of(tasks.create(request));
+
+  //   tasks.list.epic(action$).subscribe(({ payload }) => {
+  //     expect(payload).to.deep.equal({
+  //       request,
+  //       response: { message: 'test getJSON' }
+  //     });
+  //     expect(config.ajax.getJSON.args[0][0]).to.equal('/albums/10/songs');
+  //     done();
+  //   });
+  // });
 });
