@@ -11,7 +11,7 @@ import generateEpic, {
 
 function getTask(options, ajax) {
   const type = options.actions.wait.toString();
-  const waitStub = sinon.stub(options.actions, 'wait').callThrough().toString = () => type;
+  sinon.stub(options.actions, 'wait').callThrough().toString = () => type;
   sinon.stub(options.actions, 'success').callThrough();
   sinon.stub(options.actions, 'failure').callThrough();
 
@@ -288,7 +288,7 @@ describe('generateEpic', () => {
       );
 
       const type = actions.wait.toString();
-      const waitStub = sinon.stub(actions, 'wait').callThrough().toString = () => type;
+      sinon.stub(actions, 'wait').callThrough().toString = () => type;
       sinon.stub(actions, 'success').callThrough();
       sinon.stub(actions, 'failure').callThrough();
 

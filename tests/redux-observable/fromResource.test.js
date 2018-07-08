@@ -118,7 +118,7 @@ describe('fromResource: redux-observable', () => {
     });
   });
 
-  // it('creates an root epic for all the operations', done => {
+  // It('creates an root epic for all the operations', done => {
   //   const tasks = fromResource(resource, config);
   //   const request = { params: { id: 10 } };
   //   const action$ = of(tasks.create(request));

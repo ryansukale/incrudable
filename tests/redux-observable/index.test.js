@@ -29,13 +29,18 @@ const resources = {
 describe('incrudable', () => {
   it('create the actions and tasks for resources', () => {
     const tasks = incrudable(resources);
+    expect(tasks.epic).to.be.a('function');
 
     Object.keys(resources).forEach(resource => {
+      expect(tasks[resource].epic).to.be.a('function');
+
       Object.keys(resources[resource].operations).forEach(operation => {
-        expect(tasks[resource][operation]).to.be.a('function');
-        expect(tasks[resource][operation].success).to.be.a('function');
-        expect(tasks[resource][operation].failure).to.be.a('function');
-        expect(tasks[resource][operation].wait).to.be.a('function');
+        const opTask = tasks[resource][operation];
+        expect(opTask).to.be.a('function');
+        expect(opTask.epic).to.be.a('function');
+        expect(opTask.success).to.be.a('function');
+        expect(opTask.failure).to.be.a('function');
+        expect(opTask.wait).to.be.a('function');
       });
     });
   });
