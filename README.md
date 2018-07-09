@@ -1,9 +1,8 @@
 ![incrudable javascript library](logo_incrudable.svg)
 
-incrudable
-----
+## incrudable
 
-*Automagically generate thunks or epics for your application's CRUD routes.*
+_Automagically generate thunks or epics for your application's CRUD routes._
 
 ---
 
@@ -20,6 +19,7 @@ npm install incrudable --save
 ---
 
 ### Philosophy
+
 Having to learn a new library is often a pain. While building incrudable, one of my goals was to allow developers to use all their existing knowledge of `redux-thunks` or `redux-observables`( so it should be 100% compatible with existing codebases), and let this library just provide a bunch of utility functions to reduce boilerplate.
 
 Use as little or as much as you need of this library. There are a few conventions to follow in support the above mentioned lifecycle. Almost everything else is customizable.
@@ -27,7 +27,9 @@ Use as little or as much as you need of this library. There are a few convention
 ---
 
 ### What problem is this library trying to solve?
+
 Assume we can define a crud resource that supports the following operations.
+
 ```js
 const resources = {
   songs: {
@@ -42,6 +44,7 @@ const resources = {
   }
 };
 ```
+
 For the sake of conversation, lets take the first operation - `create`. When a user interacts with the application to create a song, usually, there are 3 meaningful events that a store can handle in the below sequence(and perhaps these events are relevant to the UI as well)
 
 - 1 - Loading/Waiting - just before the request is made
@@ -93,6 +96,7 @@ The hash of functions above are called `tasks`. If you are using `redux-thunk`, 
 ---
 
 ### Setup
+
 Setting up `redux-thunk` is done as per [their documentation](https://github.com/reduxjs/redux-thunk#installation). And since for the `redux-thunk` implementation, tasks are simply thunks, you can start using them right away in your code the way you use your own thunks.
 
 If you are using `redux-observable`, you need epics which can be setup as middleware for the store. Therefore each task created via `incrudable/lib/redux-observable` has a special property called `epic` that you can use during your middleware integration. It also exports a top level epic which can be used as a root epic, which is the result of combining all the child epics.
@@ -149,7 +153,6 @@ class MyClass extends React.Component {
         ...All the good stuff...
     }
 }
-
 ```
 
 And here's how you could use them in your reducer.
@@ -163,7 +166,7 @@ function songssReducer(state, {action, payload}) {
   switch (action) {
     case songs.create.success: // OR 'CREATE_SONGS_SUCCESS'
       return {latest: payload};
-    case songs.create.failure: // OR 'CREATE_SONGS_FAILURE' 
+    case songs.create.failure: // OR 'CREATE_SONGS_FAILURE'
       return {errors: payload};
     case songs.create.wait:  // OR 'CREATE_SONGS_WAIT'
       return {isLoading: true};
@@ -179,11 +182,13 @@ function songssReducer(state, {action, payload}) {
   }
 }
 ```
+
 ---
 
 ### Is there anything special about tasks?
 
 If you notice in the example above, the exported tasks have 2 special characteristics
+
 - The format of the payload it expects.
 - The attributes that are available as event names to be used in the reducer
 
@@ -192,7 +197,9 @@ All of these are covered in the following sections.
 ---
 
 ### Payload format
+
 In order to provide a simple interface while making minimal assumptions about your business logic, a task expects a payload to be an object of the following format
+
 ```
 const payload = {
     body: {}, // An optional hash, which is only required for operations that use the POST and PUT methods
@@ -204,17 +211,19 @@ const payload = {
 ---
 
 ### Customizing operations
+
 Each named operation of a resources corresponds to an endpoint url. By default, `incrudable` uses a few well known operation names to determine their http method.
 
-|operation name | method|
-|---|---|
-|create| POST|
-|read| GET|
-|update| PUT|
-|del| DELETE|
-|list| GET|
+| operation name | method |
+| -------------- | ------ |
+| create         | POST   |
+| read           | GET    |
+| update         | PUT    |
+| del            | DELETE |
+| list           | GET    |
 
 You can also create custom operation names and specify their http methods and url. e.g.
+
 ```js
 // modules/sources.js
 const resource = {
@@ -267,7 +276,8 @@ const resource = {
     sortedList: {
       url: '/api/albums/:id/songs',
       method: 'GET',
-      actionsTypes: { // Custom event names hash for the lifecycle events
+      actionsTypes: {
+        // Custom event names hash for the lifecycle events
         wait: 'SORTED_SONGS_LOADING',
         success: 'SORTED_SONGS_DONE',
         failure: 'SORTED_SONGS_ERROR'
@@ -279,7 +289,7 @@ const resource = {
 
 The custom actionTypes hash must have 3 keys - `wait`, `success`, and `failure` since these are the action names that that will be called in the lifecycle of the whenever the thunk/epic is invoked by your application.
 
-The nice thing about operation customization is that they can be done for the well-known operations like `create`, `read`, `update`, `del`, and `list` and  as well. For example
+The nice thing about operation customization is that they can be done for the well-known operations like `create`, `read`, `update`, `del`, and `list` and as well. For example
 
 ```js
 const resource = {
@@ -288,7 +298,8 @@ const resource = {
     create: {
       url: '/api/albums/:id/songs',
       method: 'POST',
-      actionsTypes: { // Custom event names hash for the lifecycle events
+      actionsTypes: {
+        // Custom event names hash for the lifecycle events
         wait: 'CUSTOM_SONGS_LOADING',
         success: 'CUSTOM_SONGS_DONE',
         failure: 'CUSTOM_SONGS_ERROR'
@@ -301,16 +312,20 @@ const resource = {
 ---
 
 ### Lifecycle hooks
+
 Apart from letting you customize the actions and methods, the library also lets you add hooks into the lifecyce - beforeSubmit, onSuccess and onFailure to tackle custom scenarios.
 
 #### beforeSumit
+
 A function that receives the data of the request and must return a value that is treated as the request. The beforeSubmit function is a great place to
-1) Handle custom parsing of request data e.g. if you'd like to create derived parameters based on user input.
-2) Debounce/delay expensive operations
+
+1.  Handle custom parsing of request data e.g. if you'd like to create derived parameters based on user input.
+2.  Debounce/delay expensive operations
 
 Due to the inherent difference in implemenations of `redux-thunk` and `redux-observable`, the signature of the beforeSubmit function is slightly different. An simple example for both has been provided belowl.
 
-##### Usage with redux-thunks, 
+##### Usage with redux-thunks,
+
 **Signature**:
 `beforeSubmit(object)`
 
@@ -320,8 +335,9 @@ Due to the inherent difference in implemenations of `redux-thunk` and `redux-obs
 **Return value**
 
 This can be one of
-  -  An object. By default, the original request payload is returned.
-  -  A Promise - Which resolves with an object which represents the request.
+
+- An object. By default, the original request payload is returned.
+- A Promise - Which resolves with an object which represents the request.
 
 The following examples demonstrate the using a debounced beforeSubmit for both `redux-thunks` and `redux-observables`
 
@@ -353,7 +369,8 @@ const resource = {
 };
 ```
 
-##### Usage with redux-observable, 
+##### Usage with redux-observable,
+
 **Signature**:
 `beforeSubmit(stream)`
 
@@ -362,7 +379,8 @@ const resource = {
 
 **Return value**
 This must be
- - An observable stream whose data represents the request to be processed.
+
+- An observable stream whose data represents the request to be processed.
 
 The example below demonstrates both debouncing as well as parameter transformation. Since you have access to the request stream, you are free to do whatever you want as long as you return a request stream for further processing the lifecycle.
 
@@ -399,9 +417,11 @@ const resource = {
 ---
 
 #### Custom onSuccess and onFailure
+
 Just like `onSubmit`, you can pass custom onSuccess and onFailure handlers. The following examples demonstrate their usage.
 
 ##### Usage with redux-thunks
+
 ```js
 // Custom Success handler
 export function customOnSuccess(
@@ -427,7 +447,7 @@ export function customOnFailure(
     request,
     errors: response.errors || response
   };
-  
+
   dispatch(actions.failure(payload));
 }
 
@@ -441,10 +461,10 @@ const resource = {
       onFailure: customOnFailure
   }
 };
-
 ```
 
 ##### Usage with redux-observable
+
 The success and failure handlers keep in line with the redux-observable's philosophy of actions in -> actions out. This is different from `redux-thunks` because an epic can only return 1 action per invocation.
 
 ```js
@@ -471,7 +491,6 @@ const resource = {
       onFailure: customOnFailure
   }
 };
-
 ```
 
 Notice that the way you configure your resource to use the custom handlers is exactly the same, irrespective of `redux-thunk` or `redux-observable`. This gives you the flexibility of using both, the frameworks in your application at the same time, if you choose to do so.
@@ -512,12 +531,12 @@ const resources = {
 };
 
 export default incrudable(resources);
-
 ```
 
 An optional config lets you inject dependencies like ajax and custom headers
 
- - **config.ajax**: A hash of methods that will be used to execute your ajax requests. Internally, the framework uses the whatwg fetch for the `redux-thunks` implementation, and `rx-lite-dom-ajax` for `redux-observable` implementation respectively.
+- **config.ajax**: A hash of methods that will be used to execute your ajax requests. Internally, the framework uses the whatwg fetch for the `redux-thunks` implementation, and `rx-lite-dom-ajax` for `redux-observable` implementation respectively.
+
 ```js
 {
   getJSON: () { ... },
@@ -527,34 +546,37 @@ An optional config lets you inject dependencies like ajax and custom headers
 }
 ```
 
-   - **config.getHeaders**: This function will get invoked during every request and the returned hash will be sent in the headers. This is a great place to put code for sending auth tokens, csrf tokens etc.
+- **config.getHeaders**: This function will get invoked during every request and the returned hash will be sent in the headers. This is a great place to put code for sending auth tokens, csrf tokens etc.
 
 ---
 
 #### fromResource(resource, config)
+
 Used to create tasks for a single resource. `resource` is a single resource. `config` is the same as the one for `incrudable`.
 
 For file size sensitive imports, you can directly use the version based on your library.
 e.g.
+
 ```js
 // For thunks
 import fromResource from 'incrudable/lib/redux-thunks/fromResource';
 // For epics
 import fromResource from 'incrudable/lib/redux-observable/fromResource';
-OR
+OR;
 const source = incrudable.fromResource(songs);
 ```
 
 ---
 
 #### createActionGroup(base, [actionNames])
+
 Creates a group of action creators using the `redux-actions` library. By default it creates three action creators `wait`, `success` and `failure`.
 
 ```js
 import createActionGroup from 'incrudable/lib/fromResource';
 // modules/jobs/actions.js
 export const groupOne = createActionGroup('ALBUMS_CREATED_BY_USER');
-/* 
+/*
 This generates an object with three named action creators
 groupOne = {
   success: f()...
@@ -564,7 +586,7 @@ groupOne = {
 */
 
 export const groupTwo = createActionGroup('FILTER_SONGS', ['pending', 'done', 'error']);
-/* 
+/*
 groupTwo = {
   done: f()...
   pending: f() ...
@@ -586,8 +608,8 @@ function reducer(state, {action, payload}) {
       return {isLoading: true};
   }
 }
-
 ```
 
 ### License
+
 MIT
