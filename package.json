@@ -1,13 +1,10 @@
 {
   "name": "incrudable",
   "version": "0.0.1",
-  "description": "Crud helpers for rxjs and redux based applications",
+  "description": "Crud utilities for redux based applications",
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
-  "files": [
-    "lib"
-  ],
   "scripts": {
     "format": "prettier --write \"**/*.{js,md}\"",
     "format:check": "prettier --list-different \"**/*.{js,md}\"",
@@ -21,6 +18,11 @@
     "prepublishOnly": "run-s build",
     "test": "mocha --recursive --require babel-core/register tests/"
   },
+  "files": [
+    "es",
+    "lib",
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ryansukale/incrudable.git"
@@ -31,6 +33,15 @@
     "url": "https://github.com/ryansukale/incrudable/issues"
   },
   "homepage": "https://github.com/ryansukale/incrudable#readme",
+  "keywords": [
+    "redux",
+    "crud",
+    "redux-crud",
+    "thunk",
+    "observable",
+    "redux-observable",
+    "redux-thunk"
+  ],
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
