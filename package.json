@@ -56,7 +56,7 @@
     "redux-actions": "^2.4.0",
     "redux-observable": "^1.0.0",
     "rx-lite-dom-ajax": "^7.0.3",
-    "rxjs": "^6.2.0",
+    "rxjs": "^6.2.1",
     "whatwg-fetch": "^2.0.4"
   },
   "xo": {
@@ -84,5 +84,8 @@
     "singleQuote": true,
     "bracketSpacing": true,
     "trailingComma": "none"
+  },
+  "peerDependencies": {
+    "redux": "^4.0.0"
   }
 }
