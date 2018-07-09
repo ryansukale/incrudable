@@ -1,11 +1,12 @@
+![incrudable javascript library](logo_incrudable.svg)
+
 incrudable
 ----
 
-Automagically generate thunks or epics for your application's CRUD routes.
+*Automagically generate thunks or epics for your application's CRUD routes.*
 
 ---
 
-### Setup
 ```
 yarn add incrudable
 // OR
@@ -25,7 +26,7 @@ Use as little or as much as you need of this library. There are a few convention
 
 ---
 
-### What problem is it trying to solve
+### What problem is this library trying to solve?
 Assume we can define a crud resource that supports the following operations.
 ```js
 const resources = {
@@ -317,9 +318,10 @@ Due to the inherent difference in implemenations of `redux-thunk` and `redux-obs
 `object`: This is same as the request that the thunk was called with.
 
 **Return value**
+
 This can be one of
-    -  An object. By default, the original request payload is returned.
-    -  A Promise - Which resolves with an object which represents the request.
+  -  An object. By default, the original request payload is returned.
+  -  A Promise - Which resolves with an object which represents the request.
 
 The following examples demonstrate the using a debounced beforeSubmit for both `redux-thunks` and `redux-observables`
 
@@ -353,9 +355,11 @@ const resource = {
 
 ##### Usage with redux-observable, 
 **Signature**:
-    - `beforeSubmit(stream)`
+`beforeSubmit(stream)`
+
 **Arguments**
-    - `stream`: This is an observable stream that only contains data specific to this task.
+`stream`: This is an observable stream that only contains data specific to this task.
+
 **Return value**
 This must be
  - An observable stream whose data represents the request to be processed.
@@ -367,7 +371,7 @@ The example below demonstrates both debouncing as well as parameter transformati
 import { debounceTime, map } from 'rxjs/operators';
 
 const beforeSubmit = request$ => {
-  // Return a custom payload after after a debounce
+  // Return a custom payload after a debounce
   // Or simply the original request object
   return request$.pipe(
     debounceTime(200),
@@ -395,7 +399,7 @@ const resource = {
 ---
 
 #### Custom onSuccess and onFailure
-Just like `onSubmit`, you can pass custom onSuccess and onFailure handlers. The following examples demonstrate the usage.
+Just like `onSubmit`, you can pass custom onSuccess and onFailure handlers. The following examples demonstrate their usage.
 
 ##### Usage with redux-thunks
 ```js
@@ -446,7 +450,7 @@ The success and failure handlers keep in line with the redux-observable's philos
 ```js
 export function customOnSuccess({ actions }, request, response) {
   const payload = { request, response };
-  return actions.success(payload); // OR You can dispatch any action you wish
+  return actions.success(payload); // OR You can return a custom action that will get dispatched
 }
 
 export function customOnFailure({ actions }, request, response) {
@@ -587,5 +591,3 @@ function reducer(state, {action, payload}) {
 
 ### License
 MIT
-
----

@@ -1,11 +1,16 @@
 {
   "name": "incrudable",
-  "version": "0.0.1",
-  "description": "Crud helpers for rxjs and redux based applications",
+  "version": "0.1.0",
+  "description": "Crud utilities for redux based applications",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "es",
+    "lib",
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ryansukale/incrudable.git"
@@ -15,5 +20,14 @@
   "bugs": {
     "url": "https://github.com/ryansukale/incrudable/issues"
   },
-  "homepage": "https://github.com/ryansukale/incrudable#readme"
+  "homepage": "https://github.com/ryansukale/incrudable#readme",
+  "keywords": [
+    "redux",
+    "crud",
+    "redux-crud",
+    "thunk",
+    "observable",
+    "redux-observable",
+    "redux-thunk"
+  ]
 }
