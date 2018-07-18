@@ -95,8 +95,5 @@
     "singleQuote": true,
     "bracketSpacing": true,
     "trailingComma": "none"
-  },
-  "peerDependencies": {
-    "redux": "^4.0.0"
   }
 }
