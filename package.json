@@ -1,6 +1,6 @@
 {
   "name": "incrudable",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0",
   "description": "Crud utilities for redux based applications",
   "main": "lib/index.js",
   "module": "es/index.js",
