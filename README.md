@@ -14,15 +14,17 @@ npm install incrudable --save
 
 ---
 
+At this time, this library exposes two implementations for creating CRUD resources - one using `redux-thunk` and another using `redux-observable`.
+
 **NOTE**: If you are using `redux-observable`, this library relies on Rxjs 6+ which has several differences from Rxjs 5. Please see the [Rxjs repository](https://github.com/ReactiveX/rxjs) for more information on backward compatibility and migration.
 
 ---
 
 ### Philosophy
 
-Having to learn a new library is often a pain. While building incrudable, one of my goals was to allow developers to use all their existing knowledge of `redux-thunks` or `redux-observables`( so it should be 100% compatible with existing codebases), and let this library just provide a bunch of utility functions to reduce boilerplate.
+Having to learn a new library is often a pain. While building incrudable, one of my goals was to enable developers to use all their existing knowledge of `redux-thunks` or `redux-observables`( so it should be 100% compatible with existing codebases), and let this library act as a complimentary set of utility functions to reduce boilerplate.
 
-Use as little or as much as you need of this library. There are a few conventions to follow in support the above mentioned lifecycle. Almost everything else is customizable.
+Use as little or as much of this library as you need. There are a few conventions to follow if you intend to use the richer functions like the `incrudable` constructor and `fromResource`. Almost everything else plug and play and highly customizable.
 
 ---
 
